@@ -83,7 +83,7 @@ export default async function RegionPage({ region }: { region: Region }) {
           bei Blizzard ist <strong>minBuyout</strong> der günstigste Stückpreis,{" "}
           <strong>quantity</strong> die angebotene Menge und <strong>auctions</strong> die Zahl der
           Angebote. Ein Klick auf eine Zeile zeigt den Preisverlauf, ein Klick auf den Namen
-          kopiert ihn.
+          kopiert ihn, der Stern setzt ein Item auf die Watchlist.
         </p>
       </header>
       {!prices && <noscript>Die Preise konnten nicht geladen werden.</noscript>}

@@ -25,10 +25,11 @@ const fmtDate = (iso: string) =>
   new Date(iso).toLocaleString("de-DE", { timeZone: "Europe/Berlin" });
 /** Preisspalten liefert TSM in Kupfer; angezeigt wird Gold/Silber/Kupfer. */
 const HIDDEN_COLUMNS = new Set(["avgSalePrice", "saleRate"]);
-const STORAGE_KEY = "wowfd.source";
-const STORAGE_EVENT = "wowfd-source-change";
+const SOURCE_KEY = "wowfd.source";
+const FAVORITES_KEY = "wowfd.favorites";
+const STORAGE_EVENT = "wowfd-storage";
 
-function subscribeSelection(onChange: () => void) {
+function subscribeStorage(onChange: () => void) {
   window.addEventListener("storage", onChange);
   window.addEventListener(STORAGE_EVENT, onChange);
   return () => {
@@ -37,17 +38,33 @@ function subscribeSelection(onChange: () => void) {
   };
 }
 
-function readStoredSelection(): string | null {
-  try {
-    return localStorage.getItem(STORAGE_KEY);
-  } catch {
-    return null; // z. B. privater Modus mit gesperrtem Speicher
-  }
+/** Ein LocalStorage-Eintrag als Text; auf dem Server und beim ersten Rendern null. */
+function useStoredValue(key: string): [string | null, (value: string) => void] {
+  const raw = useSyncExternalStore(
+    subscribeStorage,
+    () => {
+      try {
+        return localStorage.getItem(key);
+      } catch {
+        return null; // z. B. privater Modus mit gesperrtem Speicher
+      }
+    },
+    () => null,
+  );
+  const save = (value: string) => {
+    try {
+      localStorage.setItem(key, value);
+    } catch {
+      // Ohne Speicher bleibt es beim Standard.
+    }
+    window.dispatchEvent(new Event(STORAGE_EVENT));
+  };
+  return [raw, save];
 }
 
-/** Zuletzt gewählte Quelle aus dem LocalStorage; auf dem Server und beim ersten Rendern TSM. */
+/** Zuletzt gewählte Quelle; Standard ist TSM. */
 function useStoredSelection(): [SourceSelection, (sel: SourceSelection) => void] {
-  const raw = useSyncExternalStore(subscribeSelection, readStoredSelection, () => null);
+  const [raw, save] = useStoredValue(SOURCE_KEY);
   let selection = DEFAULT_SELECTION;
   if (raw) {
     try {
@@ -57,15 +74,31 @@ function useStoredSelection(): [SourceSelection, (sel: SourceSelection) => void]
       // Unlesbarer Eintrag: Standard verwenden.
     }
   }
-  const save = (sel: SourceSelection) => {
+  return [selection, (sel) => save(JSON.stringify(sel))];
+}
+
+/** Watchlist: Item-IDs im LocalStorage, gültig für alle Regionen und Quellen. */
+function useFavorites(): [Set<number>, (itemId: number) => boolean] {
+  const [raw, save] = useStoredValue(FAVORITES_KEY);
+  let ids: number[] = [];
+  if (raw) {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(sel));
+      const parsed: unknown = JSON.parse(raw);
+      if (Array.isArray(parsed)) ids = parsed.filter((v) => Number.isInteger(v));
     } catch {
-      // Ohne Speicher bleibt es bei der Standardquelle.
+      // Unlesbarer Eintrag: leere Watchlist.
     }
-    window.dispatchEvent(new Event(STORAGE_EVENT));
+  }
+  const favorites = new Set(ids);
+  /** Schaltet ein Item um und gibt zurück, ob es danach auf der Watchlist steht. */
+  const toggle = (itemId: number) => {
+    const next = new Set(favorites);
+    const added = !next.delete(itemId);
+    if (added) next.add(itemId);
+    save(JSON.stringify([...next]));
+    return added;
   };
-  return [selection, save];
+  return [favorites, toggle];
 }
 
 const PRICE_COLUMNS = new Set(["marketValue", "minBuyout", "recent", "historical", "avgSalePrice"]);
@@ -102,20 +135,40 @@ function Value({ column, n }: { column: string; n: number | undefined }) {
   );
 }
 
-function ItemLabel({ item, onCopy }: { item: PriceItem; onCopy?: (name: string) => void }) {
+interface ItemActions {
+  onCopy: (name: string) => void;
+  isFavorite: (itemId: number) => boolean;
+  onToggleFavorite: (item: PriceItem) => void;
+}
+
+function ItemLabel({ item, actions }: { item: PriceItem; actions?: ItemActions }) {
   const name = item.name ?? `Item ${item.itemId}`;
+  const favorite = actions?.isFavorite(item.itemId) ?? false;
   return (
     <span className="item">
+      {actions && (
+        <button
+          className="fav"
+          aria-pressed={favorite}
+          aria-label={favorite ? `${name} von der Watchlist entfernen` : `${name} auf die Watchlist`}
+          title={favorite ? "Von der Watchlist entfernen" : "Auf die Watchlist"}
+          onClick={(e) => {
+            e.stopPropagation();
+            actions.onToggleFavorite(item);
+          }}>
+          {favorite ? "★" : "☆"}
+        </button>
+      )}
       {/* eslint-disable-next-line @next/next/no-img-element -- kleine lokale Icons, keine Optimierung nötig */}
       <img src={`/icons/${item.itemId}.jpg`} alt="" width={28} height={28} loading="lazy" />
-      {onCopy ? (
+      {actions ? (
         <button
           className="copy"
           title="Namen kopieren"
           onClick={(e) => {
             // Nur kopieren; der Klick auf die übrige Zeile öffnet weiterhin den Verlauf.
             e.stopPropagation();
-            onCopy(name);
+            actions.onCopy(name);
           }}>
           {name}
         </button>
@@ -176,7 +229,8 @@ function CategoryTable({
   columns,
   selected,
   onSelect,
-  onCopy,
+  actions,
+  className,
 }: {
   label: string;
   caption: string;
@@ -184,7 +238,8 @@ function CategoryTable({
   columns: string[];
   selected: number | null;
   onSelect: (itemId: number) => void;
-  onCopy: (name: string) => void;
+  actions: ItemActions;
+  className?: string;
 }) {
   const [query, setQuery] = useState("");
   const [chosenSort, setSort] = useState<{ key: SortKey; desc: boolean } | null>(null);
@@ -224,7 +279,7 @@ function CategoryTable({
   };
 
   return (
-    <section className={showFarm ? "category wide" : "category"}>
+    <section className={className ?? (showFarm ? "category wide" : "category")}>
       <div className="bar">
         <h2>{label}</h2>
         <input
@@ -249,7 +304,7 @@ function CategoryTable({
             {rows.map((item) => (
               <tr key={item.itemId} aria-selected={item.itemId === selected}
                 onClick={() => onSelect(item.itemId)}>
-                <th scope="row"><ItemLabel item={item} onCopy={onCopy} /></th>
+                <th scope="row"><ItemLabel item={item} actions={actions} /></th>
                 {columns.map((c) => <td key={c}><Value column={c} n={item.values[c]} /></td>)}
                 {showFarm && (
                   <td className="left farm">
@@ -292,6 +347,7 @@ export default function PriceBoard({
   initial: Prices | null;
 }) {
   const [selection, saveSelection] = useStoredSelection();
+  const [favorites, toggleFavorite] = useFavorites();
   const selectionKey = `${selection.source}:${selection.house}`;
   const query = selectionQuery(selection);
   // Geladene Daten gehören zu genau einer Quelle; nach einem Wechsel zählen sie nicht mehr.
@@ -359,6 +415,20 @@ export default function PriceBoard({
   ].filter((c) => !HIDDEN_COLUMNS.has(c));
   const chartColumn = column && columns.includes(column) ? column : columns[0];
   const selectedItem = prices?.items.find((i) => i.itemId === selected);
+
+  const actions: ItemActions = {
+    onCopy: copyName,
+    isFavorite: (itemId) => favorites.has(itemId),
+    onToggleFavorite: (item) => {
+      const name = item.name ?? `Item ${item.itemId}`;
+      showToast(
+        toggleFavorite(item.itemId)
+          ? `„${name}“ auf der Watchlist`
+          : `„${name}“ von der Watchlist entfernt`,
+      );
+    },
+  };
+  const watchlist = prices?.items.filter((i) => favorites.has(i.itemId)) ?? [];
 
   const refresh = async () => {
     setRefreshing(true);
@@ -435,20 +505,30 @@ export default function PriceBoard({
       )}
 
       {prices && (
-        <div className="categories">
-          {prices.categories.map((cat) => {
-            const items = prices.items.filter((i) => i.category === cat.key);
-            if (items.length === 0) return null;
-            return (
-              <CategoryTable key={cat.key} label={cat.label}
-                caption={`${cat.label}: Preise in WoW Forever, Region ${region.toUpperCase()}`}
-                items={items} columns={columns} selected={selected} onCopy={copyName}
-                onSelect={(itemId) => {
-                  setSelected(itemId);
-                }} />
-            );
-          })}
-        </div>
+        <>
+          {watchlist.length > 0 ? (
+            <CategoryTable label="Watchlist" className="category watchlist"
+              caption={`Watchlist: Preise in WoW Forever, Region ${region.toUpperCase()}`}
+              items={watchlist} columns={columns} selected={selected} actions={actions}
+              onSelect={setSelected} />
+          ) : (
+            <p className="muted">
+              Watchlist: Mit dem Stern ☆ vor einem Item merkst du es dir hier vor.
+            </p>
+          )}
+          <div className="categories">
+            {prices.categories.map((cat) => {
+              const items = prices.items.filter((i) => i.category === cat.key);
+              if (items.length === 0) return null;
+              return (
+                <CategoryTable key={cat.key} label={cat.label}
+                  caption={`${cat.label}: Preise in WoW Forever, Region ${region.toUpperCase()}`}
+                  items={items} columns={columns} selected={selected} actions={actions}
+                  onSelect={setSelected} />
+              );
+            })}
+          </div>
+        </>
       )}
 
       <div className="toast" role="status" aria-live="polite">

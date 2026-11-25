@@ -30,6 +30,9 @@ In der Oberfläche per Dropdown wählbar; die letzte Auswahl bleibt im LocalStor
   den Regelwerken steht in `src/lib/sources.ts`; die API nennt nur die Fraktion, das Regelwerk
   ist aus dem Abgleich mit TSM abgeleitet.
 
+Die Watchlist (Stern vor einem Item) liegt ebenfalls im LocalStorage (`wowfd.favorites`),
+also pro Browser und ohne Konto.
+
 API: `/api/prices` und `/api/history` nehmen zusätzlich `source=blizzard&house=<id>`.
 
 ## Blob-Layout
