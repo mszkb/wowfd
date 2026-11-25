@@ -113,3 +113,24 @@ svg.chart {
   height: 200px;
   border: 1px solid color-mix(in srgb, var(--foreground) 15%, transparent);
 }
+
+h2 {
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+
+.item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.item img {
+  border-radius: 4px;
+  flex: none;
+}
+
+.rank {
+  color: #b8860b;
+  font-size: 12px;
+}

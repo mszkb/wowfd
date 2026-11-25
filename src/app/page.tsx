@@ -6,11 +6,14 @@ interface PriceItem {
   itemId: number;
   name?: string;
   values: Record<string, number>;
+  category: string;
+  rank?: number;
 }
 interface Prices {
   tsmUpdatedAt: string;
   fetchedAt: string;
   items: PriceItem[];
+  categories: { key: string; label: string }[];
 }
 interface Point {
   t: string;
@@ -18,7 +21,22 @@ interface Point {
 }
 
 const fmtDate = (iso: string) => new Date(iso).toLocaleString("de-DE");
-const fmtNum = (n: number | undefined) => (n === undefined ? "–" : n.toLocaleString("de-DE"));
+/** TSM liefert Kupfer; angezeigt wird Gold mit zwei Nachkommastellen. */
+const fmtNum = (n: number | undefined) =>
+  n === undefined
+    ? "–"
+    : `${(n / 10_000).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} g`;
+
+function ItemLabel({ item }: { item: PriceItem }) {
+  return (
+    <span className="item">
+      {/* eslint-disable-next-line @next/next/no-img-element -- kleine lokale Icons, keine Optimierung nötig */}
+      <img src={`/icons/${item.itemId}.jpg`} alt="" width={28} height={28} loading="lazy" />
+      {item.name ?? `Item ${item.itemId}`}
+      {item.rank && <span className="rank" title={`Qualität ${item.rank}`}>{"★".repeat(item.rank)}</span>}
+    </span>
+  );
+}
 
 async function getJson<T>(url: string): Promise<T> {
   const res = await fetch(url);
@@ -68,6 +86,7 @@ export default function Home() {
   const [column, setColumn] = useState<string | null>(null);
   const [days, setDays] = useState(30);
   const [points, setPoints] = useState<Point[] | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     let stale = false;
@@ -100,6 +119,18 @@ export default function Home() {
   const chartColumn = column && columns.includes(column) ? column : columns[0];
   const selectedItem = prices?.items.find((i) => i.itemId === selected);
 
+  const refresh = async () => {
+    setRefreshing(true);
+    try {
+      setPrices(await getJson<Prices>(`/api/prices?region=${region}&refresh=1`));
+      setError(null);
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
   const switchRegion = (r: string) => {
     setRegion(r);
     setPrices(null);
@@ -116,6 +147,9 @@ export default function Home() {
             {r.toUpperCase()}
           </button>
         ))}
+        <button onClick={refresh} disabled={!prices || refreshing}>
+          {refreshing ? "Aktualisiere …" : "Jetzt aktualisieren"}
+        </button>
         {prices && (
           <span className="muted">
             TSM-Stand: {fmtDate(prices.tsmUpdatedAt)} · abgerufen: {fmtDate(prices.fetchedAt)}
@@ -129,7 +163,7 @@ export default function Home() {
       {selectedItem && chartColumn && (
         <section>
           <div className="bar">
-            <strong>{selectedItem.name ?? `Item ${selectedItem.itemId}`}</strong>
+            <strong><ItemLabel item={selectedItem} /></strong>
             <select value={chartColumn} onChange={(e) => setColumn(e.target.value)}
               aria-label="Wert">
               {columns.map((c) => <option key={c}>{c}</option>)}
@@ -143,30 +177,37 @@ export default function Home() {
         </section>
       )}
 
-      {prices && (
-        <div className="scroll">
-          <table>
-            <thead>
-              <tr>
-                <th>Item</th>
-                {columns.map((c) => <th key={c}>{c}</th>)}
-              </tr>
-            </thead>
-            <tbody>
-              {prices.items.map((item) => (
-                <tr key={item.itemId} aria-selected={item.itemId === selected}
-                  onClick={() => {
-                    setPoints(null);
-                    setSelected(item.itemId);
-                  }}>
-                  <td>{item.name ?? item.itemId}</td>
-                  {columns.map((c) => <td key={c}>{fmtNum(item.values[c])}</td>)}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      {prices?.categories.map((cat) => {
+        const items = prices.items.filter((i) => i.category === cat.key);
+        if (items.length === 0) return null;
+        return (
+          <section key={cat.key}>
+            <h2>{cat.label}</h2>
+            <div className="scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Item</th>
+                    {columns.map((c) => <th key={c}>{c}</th>)}
+                  </tr>
+                </thead>
+                <tbody>
+                  {items.map((item) => (
+                    <tr key={item.itemId} aria-selected={item.itemId === selected}
+                      onClick={() => {
+                        setPoints(null);
+                        setSelected(item.itemId);
+                      }}>
+                      <td><ItemLabel item={item} /></td>
+                      {columns.map((c) => <td key={c}>{fmtNum(item.values[c])}</td>)}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        );
+      })}
     </main>
   );
 }

@@ -6,71 +6,109 @@ export function parseRegion(value: string | null): Region | null {
   return (REGIONS as readonly string[]).includes(v) ? (v as Region) : null;
 }
 
-/**
- * Item-IDs, die aus der TSM-CSV übernommen werden.
- * Leere Liste = alle Zeilen der CSV übernehmen (nicht empfohlen: jeder
- * Snapshot ist dann ~1 MB und die Historie wächst entsprechend).
- * TSM_ITEM_IDS (kommagetrennt) überschreibt die Liste ohne Code-Änderung.
- */
-const DEFAULT_ITEM_IDS: number[] = [
-  // Kräuter (Midnight)
-  236761, // Tranquility Bloom
-  236767, // Tranquility Bloom
-  236770, // Sanguithorn
-  236771, // Sanguithorn
-  236774, // Azeroot
-  236775, // Azeroot
-  236776, // Argentleaf
-  236777, // Argentleaf
-  236778, // Mana Lily
-  236779, // Mana Lily
-  236780, // Nocturnal Lotus
-  // Bufffood (Midnight, Kochkunst)
-  242272, // Quel'dorei Medley
-  242273, // Blooming Feast
-  242274, // Champion's Bento
-  242275, // Royal Roast
-  242276, // Braised Blood Hunter
-  242277, // Crimson Calamari
-  242278, // Tasty Smoked Tetra
-  242280, // Buttered Root Crab
-  242281, // Glitter Skewers
-  242282, // Null and Void Plate
-  242283, // Sun-Seared Lumifin
-  242284, // Void-Kissed Fish Rolls
-  242285, // Warped Wise Wings
-  242286, // Fel-Kissed Filet
-  242287, // Arcano Cutlets
-  242288, // Twilight Angler's Medley
-  242289, // Spellfire Filet
-  242290, // Wise Tails
-  242291, // Fried Bloomtail
-  242292, // Eversong Pudding
-  242293, // Sunwell Delight
-  242294, // Felberry Figs
-  242295, // Hearthflame Supper
-  242296, // Bloodthistle-Wrapped Cutlets
-  242297, // Mana Lily Tea
-  242298, // Argentleaf Tea
-  242299, // Sanguithorn Tea
-  242300, // Tranquility Bloom Tea
-  242301, // Azeroot Tea
-  242302, // Bloom Skewers
-  242303, // Mana-Infused Stew
-  242304, // Spiced Biscuits
-  242305, // Silvermoon Standard
-  242306, // Forager's Medley
-  242307, // Quick Sandwich
-  242308, // Portable Snack
-  242309, // Farstrider Rations
-  255845, // Silvermoon Parade
-  255846, // Harandar Celebration
-  255847, // Impossibly Royal Roast
-  255848, // Flora Frenzy
-  // Sonstiges
-  12811, // Righteous Orb
+export interface TrackedItem {
+  id: number;
+  /** Qualitätsstufe bei Items, die es in mehreren Stufen gibt. */
+  rank?: number;
+}
+
+export interface Category {
+  key: string;
+  label: string;
+  items: TrackedItem[];
+}
+
+/** Verfolgte Items nach Kategorie. Icons liegen unter public/icons/{id}.jpg. */
+export const CATEGORIES: Category[] = [
+  {
+    key: "herbs",
+    label: "Kräuter",
+    items: [
+      { id: 236761, rank: 1 }, // Tranquility Bloom
+      { id: 236767, rank: 2 }, // Tranquility Bloom
+      { id: 236770, rank: 1 }, // Sanguithorn
+      { id: 236771, rank: 2 }, // Sanguithorn
+      { id: 236774, rank: 1 }, // Azeroot
+      { id: 236775, rank: 2 }, // Azeroot
+      { id: 236776, rank: 1 }, // Argentleaf
+      { id: 236777, rank: 2 }, // Argentleaf
+      { id: 236778, rank: 1 }, // Mana Lily
+      { id: 236779, rank: 2 }, // Mana Lily
+      { id: 236780 }, // Nocturnal Lotus
+    ],
+  },
+  {
+    key: "food",
+    label: "Bufffood",
+    items: [
+      { id: 242272 }, // Quel'dorei Medley
+      { id: 242273 }, // Blooming Feast
+      { id: 242274 }, // Champion's Bento
+      { id: 242275 }, // Royal Roast
+      { id: 242276 }, // Braised Blood Hunter
+      { id: 242277 }, // Crimson Calamari
+      { id: 242278 }, // Tasty Smoked Tetra
+      { id: 242280 }, // Buttered Root Crab
+      { id: 242281 }, // Glitter Skewers
+      { id: 242282 }, // Null and Void Plate
+      { id: 242283 }, // Sun-Seared Lumifin
+      { id: 242284 }, // Void-Kissed Fish Rolls
+      { id: 242285 }, // Warped Wise Wings
+      { id: 242286 }, // Fel-Kissed Filet
+      { id: 242287 }, // Arcano Cutlets
+      { id: 242288 }, // Twilight Angler's Medley
+      { id: 242289 }, // Spellfire Filet
+      { id: 242290 }, // Wise Tails
+      { id: 242291 }, // Fried Bloomtail
+      { id: 242292 }, // Eversong Pudding
+      { id: 242293 }, // Sunwell Delight
+      { id: 242294 }, // Felberry Figs
+      { id: 242295 }, // Hearthflame Supper
+      { id: 242296 }, // Bloodthistle-Wrapped Cutlets
+      { id: 242297 }, // Mana Lily Tea
+      { id: 242298 }, // Argentleaf Tea
+      { id: 242299 }, // Sanguithorn Tea
+      { id: 242300 }, // Tranquility Bloom Tea
+      { id: 242301 }, // Azeroot Tea
+      { id: 242302 }, // Bloom Skewers
+      { id: 242303 }, // Mana-Infused Stew
+      { id: 242304 }, // Spiced Biscuits
+      { id: 242305 }, // Silvermoon Standard
+      { id: 242306 }, // Forager's Medley
+      { id: 242307 }, // Quick Sandwich
+      { id: 242308 }, // Portable Snack
+      { id: 242309 }, // Farstrider Rations
+      { id: 255845 }, // Silvermoon Parade
+      { id: 255846 }, // Harandar Celebration
+      { id: 255847 }, // Impossibly Royal Roast
+      { id: 255848 }, // Flora Frenzy
+    ],
+  },
+  {
+    key: "other",
+    label: "Sonstiges",
+    items: [
+      { id: 12811 }, // Righteous Orb
+    ],
+  },
 ];
 
+const DEFAULT_ITEM_IDS = CATEGORIES.flatMap((c) => c.items.map((i) => i.id));
+
+const ITEM_META = new Map(
+  CATEGORIES.flatMap((c) =>
+    c.items.map((i, index) => [i.id, { category: c.key, rank: i.rank, index }] as const),
+  ),
+);
+
+export function itemMeta(itemId: number) {
+  return ITEM_META.get(itemId) ?? { category: "other", rank: undefined, index: Infinity };
+}
+
+/**
+ * Item-IDs, die aus der TSM-CSV übernommen werden. TSM_ITEM_IDS
+ * (kommagetrennt) überschreibt die Liste ohne Code-Änderung.
+ */
 export function trackedItemIds(): number[] {
   const fromEnv = (process.env.TSM_ITEM_IDS ?? "")
     .split(",")
@@ -80,6 +118,8 @@ export function trackedItemIds(): number[] {
 }
 
 export const CSV_REVALIDATE_SECONDS = 600;
+/** Mindestabstand zwischen zwei erzwungenen Abrufen je Region. */
+export const REFRESH_MIN_INTERVAL_SECONDS = 60;
 export const HISTORY_MAX_AGE_DAYS = 365;
 
 /**

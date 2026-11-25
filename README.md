@@ -7,7 +7,7 @@ Persistenz ausschließlich in Vercel Blob.
 
 | Route | Zweck |
 | --- | --- |
-| `GET /api/prices?region=eu` | Holt die CSV serverseitig (10 Min gecacht), filtert die Items, speichert bei neuem TSM-Datenstand einen Snapshot. Antwort: `items`, `tsmUpdatedAt`, `fetchedAt`, `stored`. |
+| `GET /api/prices?region=eu` | Holt die CSV serverseitig (10 Min gecacht), filtert die Items, speichert bei neuem TSM-Datenstand einen Snapshot. Antwort: `items` (mit `category`, `rank`), `categories`, `tsmUpdatedAt`, `fetchedAt`, `stored`. Mit `&refresh=1` am Cache vorbei (max. 1x pro Minute je Region). |
 | `GET /api/history?itemId=…&region=…&days=30` | Verlauf eines Items für die Charts. |
 | `GET /api/cron` | Speichert EU und US. Nur mit `Authorization: Bearer $CRON_SECRET`. |
 
@@ -42,7 +42,8 @@ Variablen siehe `.env.example`. `BLOB_ACCESS` muss zum Typ des Stores passen
   (öffentlich, ohne Key; Spalten `itemId,name,marketValue,minBuyout,recent,historical,updatedAt`,
   Preise in Kupfer). Per `TSM_CSV_URL_EU` / `TSM_CSV_URL_US` überschreibbar, z. B. mit
   `…/retail/{region}/region/items.csv` für die Regionsstatistik.
-- Welche Items übernommen werden: `TSM_ITEM_IDS` (kommagetrennt) oder
-  `DEFAULT_ITEM_IDS` in `src/lib/config.ts`. Leer = alle Zeilen der CSV.
+- Welche Items übernommen werden und in welcher Kategorie sie erscheinen:
+  `CATEGORIES` in `src/lib/config.ts`. Icons liegen unter `public/icons/{itemId}.jpg`.
+  `TSM_ITEM_IDS` (kommagetrennt) überschreibt die Liste.
 - Der Datenstand kommt aus der Spalte `updatedAt`; fehlt sie, zählt der
   `Last-Modified`-Header, sonst die Abrufzeit.

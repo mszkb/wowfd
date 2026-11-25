@@ -1,17 +1,19 @@
 import { NextResponse } from "next/server";
-import { parseRegion } from "@/lib/config";
+import { CATEGORIES, itemMeta, parseRegion } from "@/lib/config";
 import { saveSnapshotIfNew } from "@/lib/store";
-import { getCurrentSnapshot } from "@/lib/tsm";
+import { getCurrentSnapshot, refreshSnapshot } from "@/lib/tsm";
 
 export async function GET(request: Request) {
-  const region = parseRegion(new URL(request.url).searchParams.get("region"));
+  const params = new URL(request.url).searchParams;
+  const region = parseRegion(params.get("region"));
+  const refresh = params.get("refresh") === "1";
   if (!region) {
     return NextResponse.json({ error: "Ungültige Region (eu | us)" }, { status: 400 });
   }
 
   let snapshot;
   try {
-    snapshot = await getCurrentSnapshot(region);
+    snapshot = await (refresh ? refreshSnapshot(region) : getCurrentSnapshot(region));
   } catch (err) {
     console.error(err);
     return NextResponse.json({ error: "TSM-CSV konnte nicht geladen werden" }, { status: 502 });
@@ -25,5 +27,14 @@ export async function GET(request: Request) {
     console.error("Snapshot konnte nicht gespeichert werden", err);
   }
 
-  return NextResponse.json({ ...snapshot, stored });
+  return NextResponse.json({
+    ...snapshot,
+    // Reihenfolge wie in der Konfiguration statt wie in der CSV.
+    items: snapshot.items
+      .map((item) => ({ item, meta: itemMeta(item.itemId) }))
+      .sort((a, b) => a.meta.index - b.meta.index)
+      .map(({ item, meta }) => ({ ...item, category: meta.category, rank: meta.rank })),
+    categories: CATEGORIES.map(({ key, label }) => ({ key, label })),
+    stored,
+  });
 }

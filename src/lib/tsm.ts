@@ -1,6 +1,7 @@
-import { unstable_cache } from "next/cache";
+import { revalidateTag, unstable_cache } from "next/cache";
 import {
   CSV_REVALIDATE_SECONDS,
+  REFRESH_MIN_INTERVAL_SECONDS,
   trackedItemIds,
   csvUrl,
   type Region,
@@ -102,9 +103,25 @@ async function fetchSnapshot(region: Region): Promise<Snapshot> {
  * Gecacht wird das gefilterte Ergebnis statt der rohen fetch-Antwort, weil der
  * Next.js-Data-Cache Einträge über 2 MB nicht speichert.
  */
+const cacheTag = (region: Region) => `tsm-${region}`;
+
 export function getCurrentSnapshot(region: Region): Promise<Snapshot> {
   // Item-Liste gehört zum Cache-Key, damit eine geänderte Liste sofort greift.
   return unstable_cache(fetchSnapshot, ["tsm-snapshot", trackedItemIds().join(",")], {
     revalidate: CSV_REVALIDATE_SECONDS,
+    tags: [cacheTag(region)],
   })(region);
+}
+
+/**
+ * Holt die CSV am Cache vorbei, höchstens einmal pro Minute je Region –
+ * sonst könnte jeder Aufrufer beliebig viele Abrufe bei TSM auslösen.
+ */
+export async function refreshSnapshot(region: Region): Promise<Snapshot> {
+  const cached = await getCurrentSnapshot(region);
+  const ageSeconds = (Date.now() - Date.parse(cached.fetchedAt)) / 1000;
+  if (ageSeconds < REFRESH_MIN_INTERVAL_SECONDS) return cached;
+  const fresh = await fetchSnapshot(region);
+  revalidateTag(cacheTag(region), { expire: 0 });
+  return fresh;
 }
