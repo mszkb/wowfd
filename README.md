@@ -1,6 +1,6 @@
 # wowfd
 
-WoW-Classic-Preise aus der TSM-CSV, mit Verlauf. Next.js (App Router) auf Vercel,
+WoW-Forever-Preise aus der TSM-CSV, mit Verlauf. Next.js (App Router) auf Vercel,
 Persistenz ausschließlich in Vercel Blob.
 
 ## Endpunkte
@@ -38,11 +38,11 @@ Variablen siehe `.env.example`. `BLOB_ACCESS` muss zum Typ des Stores passen
 
 ## Konfiguration
 
-- Quelle: `https://public-data.tradeskillmaster.com/classic/{region}/region/items.csv`
+- Quelle: `https://public-data.tradeskillmaster.com/forever/{region}/region/items.csv`
   (öffentlich, ohne Key; Spalten `itemId,name,marketValue,historical,avgSalePrice,saleRate,soldPerDay,updatedAt`,
-  Preise in Kupfer, regionsweite Statistik über alle Classic-Realms). Per `TSM_CSV_URL_EU` /
+  Preise in Kupfer, regionsweite Statistik über alle Regelwerke und Fraktionen). Per `TSM_CSV_URL_EU` /
   `TSM_CSV_URL_US` überschreibbar, z. B. mit einer Realm-Datei
-  `…/classic/{region}/realm/{realm}/items.csv`, die auch `minBuyout` enthält.
+  `…/forever/{region}/realm/normal-alliance/items.csv`, die auch `minBuyout` enthält.
 - Welche Items übernommen werden und in welcher Kategorie sie erscheinen:
   `CATEGORIES` in `src/lib/config.ts`. Icons liegen unter `public/icons/{itemId}.jpg`.
   `TSM_ITEM_IDS` (kommagetrennt) überschreibt die Liste.

@@ -151,7 +151,7 @@ export default function Home() {
 
   return (
     <main>
-      <h1>WoW-Classic-Preise (TSM)</h1>
+      <h1>WoW-Forever-Preise (TSM)</h1>
       <div className="bar">
         {["eu", "us"].map((r) => (
           <button key={r} onClick={() => switchRegion(r)} aria-pressed={r === region}

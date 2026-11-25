@@ -54,14 +54,56 @@ export const CATEGORIES: Category[] = [
       { id: 13466 }, // Plaguebloom
       { id: 13467 }, // Icecap
       { id: 13468 }, // Black Lotus
-      { id: 19726 }, // Bloodvine
+      { id: 248821 }, // Demonsage
+      { id: 248822 }, // Death Lotus
+      { id: 248823 }, // Marefoil
+      { id: 249274 }, // Stranglevine
+      { id: 249399 }, // Frilled Lichen
+      { id: 249424 }, // Rosecap
+      { id: 268415 }, // Commonplace Herb Seeds
+      { id: 268416 }, // Uncommon Herb Seeds
+      { id: 268417 }, // Unusual Herb Seeds
+      { id: 268418 }, // Scarce Herb Seeds
     ],
   },
   {
     key: "food",
     label: "Bufffood",
     items: [
-      { id: 21023 }, // Dirge's Kickin' Chimaerok Chops
+      { id: 250065 }, // Savory Stag Sliders
+      { id: 250067 }, // Bat Hachee
+      { id: 250068 }, // Savory Turtle Stew
+      { id: 250069 }, // Flank au Poivre
+      { id: 250070 }, // Bear Bruscitti
+      { id: 250071 }, // Steaming Stag Steak
+      { id: 250072 }, // Swiftstrike Steak
+      { id: 250073 }, // Raging Raptor Ribs
+      { id: 250074 }, // Bear Brisket
+      { id: 250075 }, // Prehistoric Pulled Raptor
+      { id: 250076 }, // Raptor Rouladen
+      { id: 250077 }, // Twice-Spiced Raptor Slice
+      { id: 250078 }, // Giant Scrambled Eggs
+      { id: 250079 }, // Tasty Raptor Bites
+      { id: 250080 }, // Breakfast Omelette
+      { id: 250081 }, // Clam Linguine
+      { id: 274971 }, // Briny Seafood Stew
+      { id: 274976 }, // Plain Ol' Paletusk
+      { id: 286152 }, // Plated Armorfish
+      { id: 263509 }, // Skywall Souffle
+      { id: 263512 }, // Pincer Bites
+      { id: 267341 }, // Sweetpaw Jam
+      { id: 249865 }, // Peace Tea
+      { id: 249866 }, // Royal Tea
+      { id: 249867 }, // Root Tea
+      { id: 249868 }, // Triage Tea
+      { id: 249869 }, // Sunny Tea
+      { id: 249870 }, // Sage's Tea
+      { id: 249871 }, // Venomous Smoothie
+      { id: 249872 }, // Slimy Smoothie
+      { id: 249873 }, // Mrrggl Smrrthle
+      { id: 249874 }, // Calcified Smoothie
+      { id: 249875 }, // Spicy Smoothie
+      { id: 249876 }, // Wicked Smoothie
       { id: 20452 }, // Smoked Desert Dumplings
       { id: 18254 }, // Runn Tum Tuber Surprise
       { id: 13928 }, // Grilled Squid
@@ -73,7 +115,6 @@ export const CATEGORIES: Category[] = [
       { id: 13934 }, // Mightfish Steak
       { id: 13933 }, // Lobster Stew
       { id: 13935 }, // Baked Salmon
-      { id: 13929 }, // Hot Smoked Bass
       { id: 18045 }, // Tender Wolf Steak
       { id: 12218 }, // Monster Omelet
       { id: 12216 }, // Spiced Chili Crab
@@ -129,13 +170,13 @@ export const REFRESH_MIN_INTERVAL_SECONDS = 60;
 export const HISTORY_MAX_AGE_DAYS = 365;
 
 /**
- * Öffentliche TSM-CSV mit den regionsweiten Classic-Preisen (Kupfer).
+ * Öffentliche TSM-CSV mit den regionsweiten WoW-Forever-Preisen (Kupfer).
  * Per TSM_CSV_URL_EU / TSM_CSV_URL_US überschreibbar.
  */
 export function csvUrl(region: Region): string {
   return (
     process.env[`TSM_CSV_URL_${region.toUpperCase()}`] ||
-    `https://public-data.tradeskillmaster.com/classic/${region}/region/items.csv`
+    `https://public-data.tradeskillmaster.com/forever/${region}/region/items.csv`
   );
 }
 
