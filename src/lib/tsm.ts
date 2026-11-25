@@ -102,6 +102,9 @@ async function fetchSnapshot(region: Region): Promise<Snapshot> {
  * Gecacht wird das gefilterte Ergebnis statt der rohen fetch-Antwort, weil der
  * Next.js-Data-Cache Einträge über 2 MB nicht speichert.
  */
-export const getCurrentSnapshot = unstable_cache(fetchSnapshot, ["tsm-snapshot"], {
-  revalidate: CSV_REVALIDATE_SECONDS,
-});
+export function getCurrentSnapshot(region: Region): Promise<Snapshot> {
+  // Item-Liste gehört zum Cache-Key, damit eine geänderte Liste sofort greift.
+  return unstable_cache(fetchSnapshot, ["tsm-snapshot", trackedItemIds().join(",")], {
+    revalidate: CSV_REVALIDATE_SECONDS,
+  })(region);
+}
