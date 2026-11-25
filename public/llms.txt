@@ -1,0 +1,27 @@
+# WoW-Forever-Preise
+
+> Auktionshauspreise für World of Warcraft: Forever (EU und US) aus den öffentlichen Daten von
+> TradeSkillMaster (TSM): alle Kräuter mit Farm-Zonen, Bufffood und Righteous Orb, mit Preisverlauf.
+
+Die Seiten enthalten die vollständigen Preistabellen als HTML. Für Programme und Agents gibt es
+dieselben Daten als JSON ohne Anmeldung.
+
+## Seiten
+
+- [Preise EU](/): Tabellen für Kräuter, Bufffood und Sonstiges, Region EU
+- [Preise US](/us): dieselben Tabellen für die Region US
+
+## JSON-API
+
+- [/api/prices?region=eu](/api/prices?region=eu): aktuelle Preise. `region` ist `eu` oder `us`.
+  Felder: `tsmUpdatedAt` (Datenstand bei TSM), `fetchedAt` (Abrufzeit), `categories`,
+  `items[]` mit `itemId`, `name`, `category`, `values` und bei Kräutern `farm` (Zonen, Route).
+- [/api/history?itemId=13468&region=eu&days=30](/api/history?itemId=13468&region=eu&days=30):
+  Preisverlauf eines Items. `days` von 1 bis 365. Antwort: `points[]` mit `t` und `values`.
+
+## Einheiten
+
+- Preise (`marketValue`, `historical`, `avgSalePrice`) stehen in Kupfer: 10000 Kupfer = 1 Gold,
+  100 Kupfer = 1 Silber.
+- `soldPerDay` ist die verkaufte Menge pro Tag, `saleRate` der Anteil verkaufter Auktionen (0 bis 1).
+- Die Daten werden von TSM etwa einmal täglich aktualisiert.

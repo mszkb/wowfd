@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { CATEGORIES, itemMeta, parseRegion } from "@/lib/config";
+import { parseRegion } from "@/lib/config";
+import { toPricesView } from "@/lib/prices";
 import { saveSnapshotIfNew } from "@/lib/store";
 import { getCurrentSnapshot, refreshSnapshot } from "@/lib/tsm";
 
@@ -27,10 +28,5 @@ export async function GET(request: Request) {
     console.error("Snapshot konnte nicht gespeichert werden", err);
   }
 
-  return NextResponse.json({
-    ...snapshot,
-    items: snapshot.items.map((item) => ({ ...item, ...itemMeta(item.itemId) })),
-    categories: CATEGORIES.map(({ key, label }) => ({ key, label })),
-    stored,
-  });
+  return NextResponse.json({ ...toPricesView(snapshot), stored });
 }

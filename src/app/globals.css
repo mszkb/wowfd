@@ -86,7 +86,7 @@ table {
 
 th,
 td {
-  padding: 4px 8px;
+  padding: 4px 6px;
   text-align: right;
   border-bottom: 1px solid color-mix(in srgb, var(--foreground) 15%, transparent);
   white-space: nowrap;
@@ -141,7 +141,7 @@ h2 {
 }
 
 .category {
-  flex: 1 1 420px;
+  flex: 1 1 430px;
   min-width: 0;
   display: grid;
   gap: 8px;
@@ -201,4 +201,91 @@ td:first-child {
 
 .item {
   display: flex;
+}
+
+/* Zeilenkopf mit Itemnamen: wie eine normale Zelle darstellen. */
+tbody th {
+  font-weight: normal;
+  text-align: left;
+  white-space: normal;
+  padding: 4px 8px;
+  border-bottom: 1px solid color-mix(in srgb, var(--foreground) 15%, transparent);
+}
+
+button.copy {
+  all: unset;
+  cursor: copy;
+}
+
+button.copy:hover {
+  text-decoration: underline;
+}
+
+button.copy:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+.money {
+  display: inline-flex;
+  gap: 4px;
+  justify-content: flex-end;
+}
+
+.coin {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+a.tab {
+  padding: 4px 10px;
+  border: 1px solid color-mix(in srgb, var(--foreground) 40%, transparent);
+  border-radius: 4px;
+}
+
+a.tab[aria-current="page"] {
+  background: var(--foreground);
+  color: var(--background);
+}
+
+.intro {
+  max-width: 100ch;
+  margin-top: 6px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+footer {
+  font-size: 13px;
+}
+
+footer a {
+  text-decoration: underline;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.toast span {
+  display: block;
+  padding: 8px 14px;
+  border-radius: 6px;
+  background: var(--foreground);
+  color: var(--background);
+  font-size: 14px;
 }

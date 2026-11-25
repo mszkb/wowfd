@@ -11,6 +11,14 @@ Persistenz ausschließlich in Vercel Blob.
 | `GET /api/history?itemId=…&region=…&days=30` | Verlauf eines Items für die Charts. |
 | `GET /api/cron` | Speichert EU und US. Nur mit `Authorization: Bearer $CRON_SECRET`. |
 
+## Seiten und Auffindbarkeit
+
+- `/` (EU) und `/us` werden mit den Preisen vorgerendert (alle 10 Minuten erneuert), die
+  Tabellen stehen also im HTML und sind ohne JavaScript lesbar.
+- Je Seite: Titel, Beschreibung, Canonical, Open Graph und ein schema.org-`Dataset` (JSON-LD).
+- `robots.txt`, `sitemap.xml` und `llms.txt` (Beschreibung der Seiten und der JSON-API für Agents).
+- Die öffentliche Adresse kommt aus `NEXT_PUBLIC_SITE_URL`, sonst aus Vercels Production-Domain.
+
 ## Blob-Layout
 
 - `snapshots/{region}/{tsmUpdatedAt}.json` – ein Snapshot je Datenstand (wird nie überschrieben; `:` im Zeitstempel ist durch `-` ersetzt)
