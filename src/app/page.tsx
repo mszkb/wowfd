@@ -21,11 +21,23 @@ interface Point {
 }
 
 const fmtDate = (iso: string) => new Date(iso).toLocaleString("de-DE");
-/** TSM liefert Kupfer; angezeigt wird Gold mit zwei Nachkommastellen. */
-const fmtNum = (n: number | undefined) =>
-  n === undefined
-    ? "–"
-    : `${(n / 10_000).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} g`;
+/** Preisspalten liefert TSM in Kupfer; angezeigt wird Gold/Silber/Kupfer. */
+const PRICE_COLUMNS = new Set(["marketValue", "minBuyout", "recent", "historical", "avgSalePrice"]);
+
+function fmtValue(column: string, n: number | undefined) {
+  if (n === undefined) return "–";
+  if (!PRICE_COLUMNS.has(column)) return n.toLocaleString("de-DE");
+  const copper = Math.round(n);
+  if (copper === 0) return "–";
+  const g = Math.floor(copper / 10_000);
+  const s = Math.floor((copper % 10_000) / 100);
+  const c = copper % 100;
+  const parts = [];
+  if (g > 0) parts.push(`${g.toLocaleString("de-DE")}g`);
+  if (g > 0 || s > 0) parts.push(`${s}s`);
+  parts.push(`${c}c`);
+  return parts.join(" ");
+}
 
 function ItemLabel({ item }: { item: PriceItem }) {
   return (
@@ -70,8 +82,8 @@ function Chart({ points, column }: { points: Point[]; column: string }) {
           vectorEffect="non-scaling-stroke" />
       </svg>
       <p className="muted bar">
-        <span>Min {fmtNum(y0)}</span>
-        <span>Max {fmtNum(y1)}</span>
+        <span>Min {fmtValue(column, y0)}</span>
+        <span>Max {fmtValue(column, y1)}</span>
         <span>{data.length} Datenpunkte</span>
       </p>
     </>
@@ -139,7 +151,7 @@ export default function Home() {
 
   return (
     <main>
-      <h1>WoW-Preise (TSM)</h1>
+      <h1>WoW-Classic-Preise (TSM)</h1>
       <div className="bar">
         {["eu", "us"].map((r) => (
           <button key={r} onClick={() => switchRegion(r)} aria-pressed={r === region}
@@ -199,7 +211,7 @@ export default function Home() {
                         setSelected(item.itemId);
                       }}>
                       <td><ItemLabel item={item} /></td>
-                      {columns.map((c) => <td key={c}>{fmtNum(item.values[c])}</td>)}
+                      {columns.map((c) => <td key={c}>{fmtValue(c, item.values[c])}</td>)}
                     </tr>
                   ))}
                 </tbody>

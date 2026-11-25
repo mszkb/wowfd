@@ -24,64 +24,70 @@ export const CATEGORIES: Category[] = [
     key: "herbs",
     label: "Kräuter",
     items: [
-      { id: 236761, rank: 1 }, // Tranquility Bloom
-      { id: 236767, rank: 2 }, // Tranquility Bloom
-      { id: 236770, rank: 1 }, // Sanguithorn
-      { id: 236771, rank: 2 }, // Sanguithorn
-      { id: 236774, rank: 1 }, // Azeroot
-      { id: 236775, rank: 2 }, // Azeroot
-      { id: 236776, rank: 1 }, // Argentleaf
-      { id: 236777, rank: 2 }, // Argentleaf
-      { id: 236778, rank: 1 }, // Mana Lily
-      { id: 236779, rank: 2 }, // Mana Lily
-      { id: 236780 }, // Nocturnal Lotus
+      { id: 765 }, // Silverleaf
+      { id: 785 }, // Mageroyal
+      { id: 2447 }, // Peacebloom
+      { id: 2449 }, // Earthroot
+      { id: 2450 }, // Briarthorn
+      { id: 2452 }, // Swiftthistle
+      { id: 2453 }, // Bruiseweed
+      { id: 3355 }, // Wild Steelbloom
+      { id: 3356 }, // Kingsblood
+      { id: 3357 }, // Liferoot
+      { id: 3358 }, // Khadgar's Whisker
+      { id: 3369 }, // Grave Moss
+      { id: 3818 }, // Fadeleaf
+      { id: 3819 }, // Wintersbite
+      { id: 3820 }, // Stranglekelp
+      { id: 3821 }, // Goldthorn
+      { id: 4625 }, // Firebloom
+      { id: 8153 }, // Wildvine
+      { id: 8831 }, // Purple Lotus
+      { id: 8836 }, // Arthas' Tears
+      { id: 8838 }, // Sungrass
+      { id: 8839 }, // Blindweed
+      { id: 8845 }, // Ghost Mushroom
+      { id: 8846 }, // Gromsblood
+      { id: 13463 }, // Dreamfoil
+      { id: 13464 }, // Golden Sansam
+      { id: 13465 }, // Mountain Silversage
+      { id: 13466 }, // Plaguebloom
+      { id: 13467 }, // Icecap
+      { id: 13468 }, // Black Lotus
+      { id: 19726 }, // Bloodvine
     ],
   },
   {
     key: "food",
     label: "Bufffood",
     items: [
-      { id: 242272 }, // Quel'dorei Medley
-      { id: 242273 }, // Blooming Feast
-      { id: 242274 }, // Champion's Bento
-      { id: 242275 }, // Royal Roast
-      { id: 242276 }, // Braised Blood Hunter
-      { id: 242277 }, // Crimson Calamari
-      { id: 242278 }, // Tasty Smoked Tetra
-      { id: 242280 }, // Buttered Root Crab
-      { id: 242281 }, // Glitter Skewers
-      { id: 242282 }, // Null and Void Plate
-      { id: 242283 }, // Sun-Seared Lumifin
-      { id: 242284 }, // Void-Kissed Fish Rolls
-      { id: 242285 }, // Warped Wise Wings
-      { id: 242286 }, // Fel-Kissed Filet
-      { id: 242287 }, // Arcano Cutlets
-      { id: 242288 }, // Twilight Angler's Medley
-      { id: 242289 }, // Spellfire Filet
-      { id: 242290 }, // Wise Tails
-      { id: 242291 }, // Fried Bloomtail
-      { id: 242292 }, // Eversong Pudding
-      { id: 242293 }, // Sunwell Delight
-      { id: 242294 }, // Felberry Figs
-      { id: 242295 }, // Hearthflame Supper
-      { id: 242296 }, // Bloodthistle-Wrapped Cutlets
-      { id: 242297 }, // Mana Lily Tea
-      { id: 242298 }, // Argentleaf Tea
-      { id: 242299 }, // Sanguithorn Tea
-      { id: 242300 }, // Tranquility Bloom Tea
-      { id: 242301 }, // Azeroot Tea
-      { id: 242302 }, // Bloom Skewers
-      { id: 242303 }, // Mana-Infused Stew
-      { id: 242304 }, // Spiced Biscuits
-      { id: 242305 }, // Silvermoon Standard
-      { id: 242306 }, // Forager's Medley
-      { id: 242307 }, // Quick Sandwich
-      { id: 242308 }, // Portable Snack
-      { id: 242309 }, // Farstrider Rations
-      { id: 255845 }, // Silvermoon Parade
-      { id: 255846 }, // Harandar Celebration
-      { id: 255847 }, // Impossibly Royal Roast
-      { id: 255848 }, // Flora Frenzy
+      { id: 21023 }, // Dirge's Kickin' Chimaerok Chops
+      { id: 20452 }, // Smoked Desert Dumplings
+      { id: 18254 }, // Runn Tum Tuber Surprise
+      { id: 13928 }, // Grilled Squid
+      { id: 13931 }, // Nightfin Soup
+      { id: 21217 }, // Sagefish Delight
+      { id: 21072 }, // Smoked Sagefish
+      { id: 13932 }, // Poached Sunscale Salmon
+      { id: 13927 }, // Cooked Glossy Mightfish
+      { id: 13934 }, // Mightfish Steak
+      { id: 13933 }, // Lobster Stew
+      { id: 13935 }, // Baked Salmon
+      { id: 13929 }, // Hot Smoked Bass
+      { id: 18045 }, // Tender Wolf Steak
+      { id: 12218 }, // Monster Omelet
+      { id: 12216 }, // Spiced Chili Crab
+      { id: 12215 }, // Heavy Kodo Stew
+      { id: 12214 }, // Mystery Stew
+      { id: 12213 }, // Carrion Surprise
+      { id: 12212 }, // Jungle Stew
+      { id: 12210 }, // Roast Raptor
+      { id: 12217 }, // Dragonbreath Chili
+      { id: 16971 }, // Clamlette Surprise
+      { id: 17222 }, // Spider Sausage
+      { id: 13851 }, // Hot Wolf Ribs
+      { id: 20074 }, // Heavy Crocolisk Stew
+      { id: 21151 }, // Rumsey Rum Black Label
     ],
   },
   {
@@ -123,13 +129,13 @@ export const REFRESH_MIN_INTERVAL_SECONDS = 60;
 export const HISTORY_MAX_AGE_DAYS = 365;
 
 /**
- * Öffentliche TSM-CSV mit den regionsweiten Commodity-Preisen (Kupfer).
+ * Öffentliche TSM-CSV mit den regionsweiten Classic-Preisen (Kupfer).
  * Per TSM_CSV_URL_EU / TSM_CSV_URL_US überschreibbar.
  */
 export function csvUrl(region: Region): string {
   return (
     process.env[`TSM_CSV_URL_${region.toUpperCase()}`] ||
-    `https://public-data.tradeskillmaster.com/retail/${region}/commodities.csv`
+    `https://public-data.tradeskillmaster.com/classic/${region}/region/items.csv`
   );
 }
 
