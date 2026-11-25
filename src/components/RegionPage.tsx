@@ -7,10 +7,11 @@ import PriceBoard from "./PriceBoard";
 
 const path = (region: Region) => (region === "eu" ? "/" : "/us");
 const title = (region: Region) =>
-  `WoW Forever Auktionshauspreise ${region.toUpperCase()}: Kräuter, Bufffood, Righteous Orb`;
+  `WoW Forever Auktionshauspreise ${region.toUpperCase()}: Kräuter, Bufffood, Verzauberkunst-Materialien`;
 const description = (region: Region) =>
   `Aktuelle Auktionshauspreise für WoW Forever (${region.toUpperCase()}) aus TradeSkillMaster: ` +
-  "alle Kräuter mit Farm-Zonen und Routen, Bufffood und Righteous Orb – mit Marktwert, " +
+  "alle Kräuter mit Farm-Zonen und Routen, Bufffood, Verzauberkunst-Materialien und Righteous Orb – " +
+  "mit Marktwert, " +
   "historischem Preis, Verkäufen pro Tag und Preisverlauf.";
 
 export function regionMetadata(region: Region): Metadata {
@@ -39,7 +40,7 @@ function jsonLd(region: Region, prices: PricesView | null) {
     url: `${SITE_URL}${path(region)}`,
     inLanguage: "de",
     isAccessibleForFree: true,
-    keywords: ["World of Warcraft Forever", "Auktionshaus", "Preise", "Kräuter", "Bufffood", "TSM"],
+    keywords: ["World of Warcraft Forever", "Auktionshaus", "Preise", "Kräuter", "Bufffood", "Verzauberkunst", "TSM"],
     spatialCoverage: region.toUpperCase(),
     ...(prices ? { dateModified: prices.tsmUpdatedAt } : {}),
     isBasedOn: "https://tradeskillmaster.com/public-data",

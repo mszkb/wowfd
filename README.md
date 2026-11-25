@@ -26,6 +26,7 @@ In der Oberfläche per Dropdown wählbar; die letzte Auswahl bleibt im LocalStor
 
 - **TSM** (Standard): regionsweite Statistik, etwa täglich aktualisiert.
 - **Blizzard-API**: Angebote eines Auktionshauses (Regelwerk und Fraktion), etwa stündlich.
+  Gelesen werden Handelsware und normale Auktionen (z. B. Ruten).
   Braucht `BLIZZARD_CLIENT_ID` und `BLIZZARD_CLIENT_SECRET`. Die Zuordnung der Haus-IDs zu
   den Regelwerken steht in `src/lib/sources.ts`; die API nennt nur die Fraktion, das Regelwerk
   ist aus dem Abgleich mit TSM abgeleitet.

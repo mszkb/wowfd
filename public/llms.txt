@@ -1,14 +1,15 @@
 # WoW-Forever-Preise
 
 > Auktionshauspreise für World of Warcraft: Forever (EU und US) aus den öffentlichen Daten von
-> TradeSkillMaster (TSM): alle Kräuter mit Farm-Zonen, Bufffood und Righteous Orb, mit Preisverlauf.
+> TradeSkillMaster (TSM): alle Kräuter mit Farm-Zonen, Bufffood,
+> Verzauberkunst-Materialien und Righteous Orb, mit Preisverlauf.
 
 Die Seiten enthalten die vollständigen Preistabellen als HTML. Für Programme und Agents gibt es
 dieselben Daten als JSON ohne Anmeldung.
 
 ## Seiten
 
-- [Preise EU](/): Tabellen für Kräuter, Bufffood und Sonstiges, Region EU
+- [Preise EU](/): Tabellen für Kräuter, Bufffood, Verzauberkunst und Sonstiges, Region EU
 - [Preise US](/us): dieselben Tabellen für die Region US
 
 ## JSON-API
