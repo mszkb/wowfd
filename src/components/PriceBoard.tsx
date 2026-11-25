@@ -1,8 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import type { PricesView, PriceViewItem } from "@/lib/prices";
+import {
+  DEFAULT_SELECTION,
+  HOUSES,
+  SOURCES,
+  parseSelection,
+  selectionQuery,
+  type SourceSelection,
+} from "@/lib/sources";
 
 type PriceItem = PriceViewItem;
 type Prices = PricesView;
@@ -17,6 +25,49 @@ const fmtDate = (iso: string) =>
   new Date(iso).toLocaleString("de-DE", { timeZone: "Europe/Berlin" });
 /** Preisspalten liefert TSM in Kupfer; angezeigt wird Gold/Silber/Kupfer. */
 const HIDDEN_COLUMNS = new Set(["avgSalePrice", "saleRate"]);
+const STORAGE_KEY = "wowfd.source";
+const STORAGE_EVENT = "wowfd-source-change";
+
+function subscribeSelection(onChange: () => void) {
+  window.addEventListener("storage", onChange);
+  window.addEventListener(STORAGE_EVENT, onChange);
+  return () => {
+    window.removeEventListener("storage", onChange);
+    window.removeEventListener(STORAGE_EVENT, onChange);
+  };
+}
+
+function readStoredSelection(): string | null {
+  try {
+    return localStorage.getItem(STORAGE_KEY);
+  } catch {
+    return null; // z. B. privater Modus mit gesperrtem Speicher
+  }
+}
+
+/** Zuletzt gewählte Quelle aus dem LocalStorage; auf dem Server und beim ersten Rendern TSM. */
+function useStoredSelection(): [SourceSelection, (sel: SourceSelection) => void] {
+  const raw = useSyncExternalStore(subscribeSelection, readStoredSelection, () => null);
+  let selection = DEFAULT_SELECTION;
+  if (raw) {
+    try {
+      const parsed = JSON.parse(raw) as { source?: string; house?: number };
+      selection = parseSelection(parsed.source, parsed.house) ?? DEFAULT_SELECTION;
+    } catch {
+      // Unlesbarer Eintrag: Standard verwenden.
+    }
+  }
+  const save = (sel: SourceSelection) => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(sel));
+    } catch {
+      // Ohne Speicher bleibt es bei der Standardquelle.
+    }
+    window.dispatchEvent(new Event(STORAGE_EVENT));
+  };
+  return [selection, save];
+}
+
 const PRICE_COLUMNS = new Set(["marketValue", "minBuyout", "recent", "historical", "avgSalePrice"]);
 
 const COINS = [
@@ -136,10 +187,13 @@ function CategoryTable({
   onCopy: (name: string) => void;
 }) {
   const [query, setQuery] = useState("");
-  const [sort, setSort] = useState<{ key: SortKey; desc: boolean }>({
-    key: "marketValue",
-    desc: true,
-  });
+  const [chosenSort, setSort] = useState<{ key: SortKey; desc: boolean } | null>(null);
+  // Standard: Marktwert absteigend; Quellen ohne Marktwert sortieren nach ihrer ersten Spalte.
+  const defaultKey = columns.includes("marketValue") ? "marketValue" : (columns[0] ?? "name");
+  const sort =
+    chosenSort && (chosenSort.key === "name" || columns.includes(chosenSort.key))
+      ? chosenSort
+      : { key: defaultKey, desc: defaultKey !== "name" };
   const showFarm = items.some((i) => i.farm);
 
   const needle = query.trim().toLowerCase();
@@ -237,30 +291,40 @@ export default function PriceBoard({
   /** Serverseitig geladene Preise, damit die Tabellen schon im HTML stehen. */
   initial: Prices | null;
 }) {
-  const [prices, setPrices] = useState<Prices | null>(initial);
-  const [error, setError] = useState<string | null>(null);
+  const [selection, saveSelection] = useStoredSelection();
+  const selectionKey = `${selection.source}:${selection.house}`;
+  const query = selectionQuery(selection);
+  // Geladene Daten gehören zu genau einer Quelle; nach einem Wechsel zählen sie nicht mehr.
+  const [loaded, setLoaded] = useState<{ key: string; data: Prices } | null>(null);
+  const [error, setError] = useState<{ key: string; text: string } | null>(null);
   const [selected, setSelected] = useState<number | null>(null);
   const [column, setColumn] = useState<string | null>(null);
   const [days, setDays] = useState(30);
-  const [points, setPoints] = useState<Point[] | null>(null);
+  const [history, setHistory] = useState<{ key: string; points: Point[] } | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const prices =
+    loaded?.key === selectionKey ? loaded.data : selection.source === "tsm" ? initial : null;
+  const errorText = error?.key === selectionKey ? error.text : null;
+  const historyKey = `${selectionKey}:${selected}:${days}`;
+  const points = history?.key === historyKey ? history.points : null;
+
   // Der Abruf über die API hält die Anzeige aktuell und speichert neue Datenstände.
   useEffect(() => {
     let stale = false;
-    getJson<Prices>(`/api/prices?region=${region}`)
+    getJson<Prices>(`/api/prices?region=${region}${query}`)
       .then((p) => {
         if (stale) return;
-        setPrices(p);
+        setLoaded({ key: selectionKey, data: p });
         setError(null);
       })
-      .catch((e: Error) => !stale && !initial && setError(e.message));
+      .catch((e: Error) => !stale && setError({ key: selectionKey, text: e.message }));
     return () => {
       stale = true;
     };
-  }, [region, initial]);
+  }, [region, query, selectionKey]);
 
   const showToast = (text: string) => {
     setToast(text);
@@ -281,14 +345,14 @@ export default function PriceBoard({
     if (selected === null) return;
     let stale = false;
     getJson<{ points: Point[] }>(
-      `/api/history?itemId=${selected}&region=${region}&days=${days}`,
+      `/api/history?itemId=${selected}&region=${region}&days=${days}${query}`,
     )
-      .then((h) => !stale && setPoints(h.points))
-      .catch((e: Error) => !stale && setError(e.message));
+      .then((h) => !stale && setHistory({ key: historyKey, points: h.points }))
+      .catch((e: Error) => !stale && setError({ key: selectionKey, text: e.message }));
     return () => {
       stale = true;
     };
-  }, [selected, region, days]);
+  }, [selected, region, days, query, historyKey, selectionKey]);
 
   const columns = [
     ...new Set(prices?.items.flatMap((i) => Object.keys(i.values)) ?? []),
@@ -299,10 +363,11 @@ export default function PriceBoard({
   const refresh = async () => {
     setRefreshing(true);
     try {
-      setPrices(await getJson<Prices>(`/api/prices?region=${region}&refresh=1`));
+      const data = await getJson<Prices>(`/api/prices?region=${region}&refresh=1${query}`);
+      setLoaded({ key: selectionKey, data });
       setError(null);
     } catch (e) {
-      setError((e as Error).message);
+      setError({ key: selectionKey, text: (e as Error).message });
     } finally {
       setRefreshing(false);
     }
@@ -319,20 +384,38 @@ export default function PriceBoard({
             </Link>
           ))}
         </nav>
+        <label className="bar">
+          Quelle
+          <select value={selection.source}
+            onChange={(e) =>
+              saveSelection({ ...selection, source: e.target.value as SourceSelection["source"] })
+            }>
+            {SOURCES.map((src) => <option key={src.key} value={src.key}>{src.label}</option>)}
+          </select>
+        </label>
+        {selection.source === "blizzard" && (
+          <label className="bar">
+            Auktionshaus
+            <select value={selection.house}
+              onChange={(e) => saveSelection({ ...selection, house: Number(e.target.value) })}>
+              {HOUSES.map((h) => <option key={h.id} value={h.id}>{h.label}</option>)}
+            </select>
+          </label>
+        )}
         <button onClick={refresh} disabled={!prices || refreshing}>
           {refreshing ? "Aktualisiere …" : "Jetzt aktualisieren"}
         </button>
         {prices && (
           <span className="muted">
-            TSM-Stand: <time dateTime={prices.tsmUpdatedAt}>{fmtDate(prices.tsmUpdatedAt)}</time>
+            Datenstand: <time dateTime={prices.tsmUpdatedAt}>{fmtDate(prices.tsmUpdatedAt)}</time>
             {" · abgerufen: "}
             <time dateTime={prices.fetchedAt}>{fmtDate(prices.fetchedAt)}</time>
           </span>
         )}
       </div>
 
-      {error && <p role="alert">Fehler: {error}</p>}
-      {!prices && !error && <p className="muted">Lade …</p>}
+      {errorText && <p role="alert">Fehler: {errorText}</p>}
+      {!prices && !errorText && <p className="muted">Lade …</p>}
 
       {selectedItem && chartColumn && (
         <section>
@@ -361,7 +444,6 @@ export default function PriceBoard({
                 caption={`${cat.label}: Preise in WoW Forever, Region ${region.toUpperCase()}`}
                 items={items} columns={columns} selected={selected} onCopy={copyName}
                 onSelect={(itemId) => {
-                  setPoints(null);
                   setSelected(itemId);
                 }} />
             );

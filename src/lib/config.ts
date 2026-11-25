@@ -20,6 +20,7 @@ const ROUTE_HIGH =
 
 export interface TrackedItem {
   id: number;
+  name: string;
   farm?: FarmInfo;
   /** Qualitätsstufe bei Items, die es in mehreren Stufen gibt. */
   rank?: number;
@@ -37,118 +38,118 @@ export const CATEGORIES: Category[] = [
     key: "herbs",
     label: "Kräuter",
     items: [
-      { id: 765, farm: { zones: "Elwynn Forest (A), Tirisfal Glades (H)", routeUrl: ROUTE_EARLY } }, // Silverleaf
-      { id: 785, farm: { zones: "The Barrens, Westfall", routeUrl: ROUTE_EARLY } }, // Mageroyal
-      { id: 2447, farm: { zones: "Elwynn Forest (A), Tirisfal Glades (H)", routeUrl: ROUTE_EARLY } }, // Peacebloom
-      { id: 2449, farm: { zones: "Durotar, Loch Modan", routeUrl: ROUTE_EARLY } }, // Earthroot
-      { id: 2450, farm: { zones: "The Barrens, Darkshore", routeUrl: ROUTE_EARLY } }, // Briarthorn
-      { id: 2452, farm: { zones: "Beifang aus Briarthorn und Mageroyal", routeUrl: ROUTE_EARLY } }, // Swiftthistle
-      { id: 2453, farm: { zones: "Hillsbrad Foothills, Ashenvale", routeUrl: ROUTE_EARLY } }, // Bruiseweed
-      { id: 3355, farm: { zones: "Stranglethorn Vale, Arathi Highlands", routeUrl: ROUTE_EARLY } }, // Wild Steelbloom
-      { id: 3356, farm: { zones: "Wetlands, Stranglethorn Vale", routeUrl: ROUTE_EARLY } }, // Kingsblood
-      { id: 3357, farm: { zones: "Flussufer: Wetlands, The Hinterlands", routeUrl: ROUTE_HIGH } }, // Liferoot
-      { id: 3358, farm: { zones: "Stranglethorn Vale, The Hinterlands", routeUrl: ROUTE_HIGH } }, // Khadgar's Whisker
-      { id: 3369, farm: { zones: "Friedhöfe: Raven Hill (Duskwood), Kodo Graveyard (Desolace)", routeUrl: ROUTE_EARLY } }, // Grave Moss
-      { id: 3818, farm: { zones: "Arathi Highlands, Swamp of Sorrows", routeUrl: ROUTE_HIGH } }, // Fadeleaf
-      { id: 3819, farm: { zones: "Alterac Mountains", routeUrl: ROUTE_HIGH } }, // Wintersbite
-      { id: 3820, farm: { zones: "Küsten: Stranglethorn Vale, Wetlands", routeUrl: ROUTE_EARLY } }, // Stranglekelp
-      { id: 3821, farm: { zones: "Arathi Highlands, Stranglethorn Vale", routeUrl: ROUTE_HIGH } }, // Goldthorn
-      { id: 4625, farm: { zones: "Tanaris, Searing Gorge", routeUrl: ROUTE_HIGH } }, // Firebloom
-      { id: 8153, farm: { zones: "Beifang aus Purple Lotus; Trolle in The Hinterlands", routeUrl: ROUTE_HIGH } }, // Wildvine
-      { id: 8831, farm: { zones: "Ruinen in Feralas, Tanaris, Azshara", routeUrl: ROUTE_HIGH } }, // Purple Lotus
-      { id: 8836, farm: { zones: "Western und Eastern Plaguelands, Felwood", routeUrl: ROUTE_HIGH } }, // Arthas' Tears
-      { id: 8838, farm: { zones: "The Hinterlands, Feralas, Azshara", routeUrl: ROUTE_HIGH } }, // Sungrass
-      { id: 8839, farm: { zones: "Swamp of Sorrows, Un'Goro Crater", routeUrl: ROUTE_HIGH } }, // Blindweed
-      { id: 8845, farm: { zones: "Höhlen: Fungal Rock (Un'Goro), The Hinterlands", routeUrl: ROUTE_HIGH } }, // Ghost Mushroom
-      { id: 8846, farm: { zones: "Felwood, Blasted Lands", routeUrl: ROUTE_HIGH } }, // Gromsblood
-      { id: 13463, farm: { zones: "Azshara, Un'Goro Crater, Burning Steppes", routeUrl: ROUTE_HIGH } }, // Dreamfoil
-      { id: 13464, farm: { zones: "Azshara, Felwood", routeUrl: ROUTE_HIGH } }, // Golden Sansam
-      { id: 13465, farm: { zones: "Winterspring, Un'Goro Crater", routeUrl: ROUTE_HIGH } }, // Mountain Silversage
-      { id: 13466, farm: { zones: "Eastern und Western Plaguelands, Felwood", routeUrl: ROUTE_HIGH } }, // Plaguebloom
-      { id: 13467, farm: { zones: "Winterspring", routeUrl: ROUTE_HIGH } }, // Icecap
-      { id: 13468, farm: { zones: "Winterspring, Eastern Plaguelands, Burning Steppes, Silithus", routeUrl: ROUTE_HIGH } }, // Black Lotus
-      { id: 248821, farm: { zones: "Fundorte noch nicht dokumentiert" } }, // Demonsage
-      { id: 248822, farm: { zones: "Fundorte noch nicht dokumentiert" } }, // Death Lotus
-      { id: 248823, farm: { zones: "Fundorte noch nicht dokumentiert" } }, // Marefoil
-      { id: 249274, farm: { zones: "Fundorte noch nicht dokumentiert" } }, // Stranglevine
-      { id: 249399, farm: { zones: "Fundorte noch nicht dokumentiert" } }, // Frilled Lichen
-      { id: 249424, farm: { zones: "Fundorte noch nicht dokumentiert" } }, // Rosecap
-      { id: 268415 }, // Commonplace Herb Seeds
-      { id: 268416 }, // Uncommon Herb Seeds
-      { id: 268417 }, // Unusual Herb Seeds
-      { id: 268418 }, // Scarce Herb Seeds
+      { id: 765, name: "Silverleaf", farm: { zones: "Elwynn Forest (A), Tirisfal Glades (H)", routeUrl: ROUTE_EARLY } },
+      { id: 785, name: "Mageroyal", farm: { zones: "The Barrens, Westfall", routeUrl: ROUTE_EARLY } },
+      { id: 2447, name: "Peacebloom", farm: { zones: "Elwynn Forest (A), Tirisfal Glades (H)", routeUrl: ROUTE_EARLY } },
+      { id: 2449, name: "Earthroot", farm: { zones: "Durotar, Loch Modan", routeUrl: ROUTE_EARLY } },
+      { id: 2450, name: "Briarthorn", farm: { zones: "The Barrens, Darkshore", routeUrl: ROUTE_EARLY } },
+      { id: 2452, name: "Swiftthistle", farm: { zones: "Beifang aus Briarthorn und Mageroyal", routeUrl: ROUTE_EARLY } },
+      { id: 2453, name: "Bruiseweed", farm: { zones: "Hillsbrad Foothills, Ashenvale", routeUrl: ROUTE_EARLY } },
+      { id: 3355, name: "Wild Steelbloom", farm: { zones: "Stranglethorn Vale, Arathi Highlands", routeUrl: ROUTE_EARLY } },
+      { id: 3356, name: "Kingsblood", farm: { zones: "Wetlands, Stranglethorn Vale", routeUrl: ROUTE_EARLY } },
+      { id: 3357, name: "Liferoot", farm: { zones: "Flussufer: Wetlands, The Hinterlands", routeUrl: ROUTE_HIGH } },
+      { id: 3358, name: "Khadgar's Whisker", farm: { zones: "Stranglethorn Vale, The Hinterlands", routeUrl: ROUTE_HIGH } },
+      { id: 3369, name: "Grave Moss", farm: { zones: "Friedhöfe: Raven Hill (Duskwood), Kodo Graveyard (Desolace)", routeUrl: ROUTE_EARLY } },
+      { id: 3818, name: "Fadeleaf", farm: { zones: "Arathi Highlands, Swamp of Sorrows", routeUrl: ROUTE_HIGH } },
+      { id: 3819, name: "Wintersbite", farm: { zones: "Alterac Mountains", routeUrl: ROUTE_HIGH } },
+      { id: 3820, name: "Stranglekelp", farm: { zones: "Küsten: Stranglethorn Vale, Wetlands", routeUrl: ROUTE_EARLY } },
+      { id: 3821, name: "Goldthorn", farm: { zones: "Arathi Highlands, Stranglethorn Vale", routeUrl: ROUTE_HIGH } },
+      { id: 4625, name: "Firebloom", farm: { zones: "Tanaris, Searing Gorge", routeUrl: ROUTE_HIGH } },
+      { id: 8153, name: "Wildvine", farm: { zones: "Beifang aus Purple Lotus; Trolle in The Hinterlands", routeUrl: ROUTE_HIGH } },
+      { id: 8831, name: "Purple Lotus", farm: { zones: "Ruinen in Feralas, Tanaris, Azshara", routeUrl: ROUTE_HIGH } },
+      { id: 8836, name: "Arthas' Tears", farm: { zones: "Western und Eastern Plaguelands, Felwood", routeUrl: ROUTE_HIGH } },
+      { id: 8838, name: "Sungrass", farm: { zones: "The Hinterlands, Feralas, Azshara", routeUrl: ROUTE_HIGH } },
+      { id: 8839, name: "Blindweed", farm: { zones: "Swamp of Sorrows, Un'Goro Crater", routeUrl: ROUTE_HIGH } },
+      { id: 8845, name: "Ghost Mushroom", farm: { zones: "Höhlen: Fungal Rock (Un'Goro), The Hinterlands", routeUrl: ROUTE_HIGH } },
+      { id: 8846, name: "Gromsblood", farm: { zones: "Felwood, Blasted Lands", routeUrl: ROUTE_HIGH } },
+      { id: 13463, name: "Dreamfoil", farm: { zones: "Azshara, Un'Goro Crater, Burning Steppes", routeUrl: ROUTE_HIGH } },
+      { id: 13464, name: "Golden Sansam", farm: { zones: "Azshara, Felwood", routeUrl: ROUTE_HIGH } },
+      { id: 13465, name: "Mountain Silversage", farm: { zones: "Winterspring, Un'Goro Crater", routeUrl: ROUTE_HIGH } },
+      { id: 13466, name: "Plaguebloom", farm: { zones: "Eastern und Western Plaguelands, Felwood", routeUrl: ROUTE_HIGH } },
+      { id: 13467, name: "Icecap", farm: { zones: "Winterspring", routeUrl: ROUTE_HIGH } },
+      { id: 13468, name: "Black Lotus", farm: { zones: "Winterspring, Eastern Plaguelands, Burning Steppes, Silithus", routeUrl: ROUTE_HIGH } },
+      { id: 248821, name: "Demonsage", farm: { zones: "Fundorte noch nicht dokumentiert" } },
+      { id: 248822, name: "Death Lotus", farm: { zones: "Fundorte noch nicht dokumentiert" } },
+      { id: 248823, name: "Marefoil", farm: { zones: "Fundorte noch nicht dokumentiert" } },
+      { id: 249274, name: "Stranglevine", farm: { zones: "Fundorte noch nicht dokumentiert" } },
+      { id: 249399, name: "Frilled Lichen", farm: { zones: "Fundorte noch nicht dokumentiert" } },
+      { id: 249424, name: "Rosecap", farm: { zones: "Fundorte noch nicht dokumentiert" } },
+      { id: 268415, name: "Commonplace Herb Seeds" },
+      { id: 268416, name: "Uncommon Herb Seeds" },
+      { id: 268417, name: "Unusual Herb Seeds" },
+      { id: 268418, name: "Scarce Herb Seeds" },
     ],
   },
   {
     key: "food",
     label: "Bufffood",
     items: [
-      { id: 250065 }, // Savory Stag Sliders
-      { id: 250067 }, // Bat Hachee
-      { id: 250068 }, // Savory Turtle Stew
-      { id: 250069 }, // Flank au Poivre
-      { id: 250070 }, // Bear Bruscitti
-      { id: 250071 }, // Steaming Stag Steak
-      { id: 250072 }, // Swiftstrike Steak
-      { id: 250073 }, // Raging Raptor Ribs
-      { id: 250074 }, // Bear Brisket
-      { id: 250075 }, // Prehistoric Pulled Raptor
-      { id: 250076 }, // Raptor Rouladen
-      { id: 250077 }, // Twice-Spiced Raptor Slice
-      { id: 250078 }, // Giant Scrambled Eggs
-      { id: 250079 }, // Tasty Raptor Bites
-      { id: 250080 }, // Breakfast Omelette
-      { id: 250081 }, // Clam Linguine
-      { id: 274971 }, // Briny Seafood Stew
-      { id: 274976 }, // Plain Ol' Paletusk
-      { id: 286152 }, // Plated Armorfish
-      { id: 263509 }, // Skywall Souffle
-      { id: 263512 }, // Pincer Bites
-      { id: 267341 }, // Sweetpaw Jam
-      { id: 249865 }, // Peace Tea
-      { id: 249866 }, // Royal Tea
-      { id: 249867 }, // Root Tea
-      { id: 249868 }, // Triage Tea
-      { id: 249869 }, // Sunny Tea
-      { id: 249870 }, // Sage's Tea
-      { id: 249871 }, // Venomous Smoothie
-      { id: 249872 }, // Slimy Smoothie
-      { id: 249873 }, // Mrrggl Smrrthle
-      { id: 249874 }, // Calcified Smoothie
-      { id: 249875 }, // Spicy Smoothie
-      { id: 249876 }, // Wicked Smoothie
-      { id: 20452 }, // Smoked Desert Dumplings
-      { id: 18254 }, // Runn Tum Tuber Surprise
-      { id: 13928 }, // Grilled Squid
-      { id: 13931 }, // Nightfin Soup
-      { id: 21217 }, // Sagefish Delight
-      { id: 21072 }, // Smoked Sagefish
-      { id: 13932 }, // Poached Sunscale Salmon
-      { id: 13927 }, // Cooked Glossy Mightfish
-      { id: 13934 }, // Mightfish Steak
-      { id: 13933 }, // Lobster Stew
-      { id: 13935 }, // Baked Salmon
-      { id: 18045 }, // Tender Wolf Steak
-      { id: 12218 }, // Monster Omelet
-      { id: 12216 }, // Spiced Chili Crab
-      { id: 12215 }, // Heavy Kodo Stew
-      { id: 12214 }, // Mystery Stew
-      { id: 12213 }, // Carrion Surprise
-      { id: 12212 }, // Jungle Stew
-      { id: 12210 }, // Roast Raptor
-      { id: 12217 }, // Dragonbreath Chili
-      { id: 16971 }, // Clamlette Surprise
-      { id: 17222 }, // Spider Sausage
-      { id: 13851 }, // Hot Wolf Ribs
-      { id: 20074 }, // Heavy Crocolisk Stew
-      { id: 21151 }, // Rumsey Rum Black Label
+      { id: 250065, name: "Savory Stag Sliders" },
+      { id: 250067, name: "Bat Hachee" },
+      { id: 250068, name: "Savory Turtle Stew" },
+      { id: 250069, name: "Flank au Poivre" },
+      { id: 250070, name: "Bear Bruscitti" },
+      { id: 250071, name: "Steaming Stag Steak" },
+      { id: 250072, name: "Swiftstrike Steak" },
+      { id: 250073, name: "Raging Raptor Ribs" },
+      { id: 250074, name: "Bear Brisket" },
+      { id: 250075, name: "Prehistoric Pulled Raptor" },
+      { id: 250076, name: "Raptor Rouladen" },
+      { id: 250077, name: "Twice-Spiced Raptor Slice" },
+      { id: 250078, name: "Giant Scrambled Eggs" },
+      { id: 250079, name: "Tasty Raptor Bites" },
+      { id: 250080, name: "Breakfast Omelette" },
+      { id: 250081, name: "Clam Linguine" },
+      { id: 274971, name: "Briny Seafood Stew" },
+      { id: 274976, name: "Plain Ol' Paletusk" },
+      { id: 286152, name: "Plated Armorfish" },
+      { id: 263509, name: "Skywall Souffle" },
+      { id: 263512, name: "Pincer Bites" },
+      { id: 267341, name: "Sweetpaw Jam" },
+      { id: 249865, name: "Peace Tea" },
+      { id: 249866, name: "Royal Tea" },
+      { id: 249867, name: "Root Tea" },
+      { id: 249868, name: "Triage Tea" },
+      { id: 249869, name: "Sunny Tea" },
+      { id: 249870, name: "Sage's Tea" },
+      { id: 249871, name: "Venomous Smoothie" },
+      { id: 249872, name: "Slimy Smoothie" },
+      { id: 249873, name: "Mrrggl Smrrthle" },
+      { id: 249874, name: "Calcified Smoothie" },
+      { id: 249875, name: "Spicy Smoothie" },
+      { id: 249876, name: "Wicked Smoothie" },
+      { id: 20452, name: "Smoked Desert Dumplings" },
+      { id: 18254, name: "Runn Tum Tuber Surprise" },
+      { id: 13928, name: "Grilled Squid" },
+      { id: 13931, name: "Nightfin Soup" },
+      { id: 21217, name: "Sagefish Delight" },
+      { id: 21072, name: "Smoked Sagefish" },
+      { id: 13932, name: "Poached Sunscale Salmon" },
+      { id: 13927, name: "Cooked Glossy Mightfish" },
+      { id: 13934, name: "Mightfish Steak" },
+      { id: 13933, name: "Lobster Stew" },
+      { id: 13935, name: "Baked Salmon" },
+      { id: 18045, name: "Tender Wolf Steak" },
+      { id: 12218, name: "Monster Omelet" },
+      { id: 12216, name: "Spiced Chili Crab" },
+      { id: 12215, name: "Heavy Kodo Stew" },
+      { id: 12214, name: "Mystery Stew" },
+      { id: 12213, name: "Carrion Surprise" },
+      { id: 12212, name: "Jungle Stew" },
+      { id: 12210, name: "Roast Raptor" },
+      { id: 12217, name: "Dragonbreath Chili" },
+      { id: 16971, name: "Clamlette Surprise" },
+      { id: 17222, name: "Spider Sausage" },
+      { id: 13851, name: "Hot Wolf Ribs" },
+      { id: 20074, name: "Heavy Crocolisk Stew" },
+      { id: 21151, name: "Rumsey Rum Black Label" },
     ],
   },
   {
     key: "other",
     label: "Sonstiges",
     items: [
-      { id: 12811 }, // Righteous Orb
+      { id: 12811, name: "Righteous Orb" },
     ],
   },
 ];
@@ -157,12 +158,17 @@ const DEFAULT_ITEM_IDS = CATEGORIES.flatMap((c) => c.items.map((i) => i.id));
 
 const ITEM_META = new Map(
   CATEGORIES.flatMap((c) =>
-    c.items.map((i) => [i.id, { category: c.key, rank: i.rank, farm: i.farm }] as const),
+    c.items.map((i) => [i.id, { category: c.key, rank: i.rank, farm: i.farm, name: i.name }] as const),
   ),
 );
 
 export function itemMeta(itemId: number) {
-  return ITEM_META.get(itemId) ?? { category: "other", rank: undefined, farm: undefined };
+  const meta = ITEM_META.get(itemId);
+  return { category: meta?.category ?? "other", rank: meta?.rank, farm: meta?.farm };
+}
+
+export function itemName(itemId: number): string | undefined {
+  return ITEM_META.get(itemId)?.name;
 }
 
 /**

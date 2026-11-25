@@ -8,11 +8,13 @@ export interface HistoryEntry {
   items: Record<string, Record<string, number>>;
 }
 
-const prefix = (region: Region) => `snapshots/${region}/`;
-const snapshotPath = (region: Region, tsmUpdatedAt: string) =>
-  `${prefix(region)}${tsmUpdatedAt.replace(/:/g, "-")}.json`;
-const latestPath = (region: Region) => `${prefix(region)}latest.json`;
-const historyPath = (region: Region) => `history-${region}.json`;
+// scope trennt die Daten je Quelle; TSM hat den leeren Scope und damit die ursprünglichen Pfade.
+const root = (scope: string) => (scope ? `${scope}/` : "");
+const prefix = (region: Region, scope: string) => `${root(scope)}snapshots/${region}/`;
+const snapshotPath = (region: Region, scope: string, tsmUpdatedAt: string) =>
+  `${prefix(region, scope)}${tsmUpdatedAt.replace(/:/g, "-")}.json`;
+const latestPath = (region: Region, scope: string) => `${prefix(region, scope)}latest.json`;
+const historyPath = (region: Region, scope: string) => `${root(scope)}history-${region}.json`;
 
 async function readJson<T>(pathname: string): Promise<T | null> {
   try {
@@ -58,13 +60,13 @@ function prune(entries: HistoryEntry[]): HistoryEntry[] {
 }
 
 /** Baut die Historie einmalig aus den Einzel-Snapshots auf (list() über den Prefix). */
-async function rebuildHistory(region: Region): Promise<HistoryEntry[]> {
+async function rebuildHistory(region: Region, scope: string): Promise<HistoryEntry[]> {
   const paths: string[] = [];
   let cursor: string | undefined;
   do {
-    const page = await list({ prefix: prefix(region), cursor, limit: 1000 });
+    const page = await list({ prefix: prefix(region, scope), cursor, limit: 1000 });
     for (const b of page.blobs) {
-      if (b.pathname !== latestPath(region)) paths.push(b.pathname);
+      if (b.pathname !== latestPath(region, scope)) paths.push(b.pathname);
     }
     cursor = page.hasMore ? page.cursor : undefined;
   } while (cursor);
@@ -79,16 +81,16 @@ async function rebuildHistory(region: Region): Promise<HistoryEntry[]> {
   return prune(entries);
 }
 
-export async function loadHistory(region: Region): Promise<HistoryEntry[]> {
-  const stored = await readJson<HistoryEntry[]>(historyPath(region));
+export async function loadHistory(region: Region, scope = ""): Promise<HistoryEntry[]> {
+  const stored = await readJson<HistoryEntry[]>(historyPath(region, scope));
   if (stored) return stored;
-  const rebuilt = await rebuildHistory(region);
-  if (rebuilt.length > 0) await writeJson(historyPath(region), rebuilt, true);
+  const rebuilt = await rebuildHistory(region, scope);
+  if (rebuilt.length > 0) await writeJson(historyPath(region, scope), rebuilt, true);
   return rebuilt;
 }
 
 // Pro Function-Instanz merken, was schon gespeichert ist – spart Blob-Aufrufe.
-const known = new Map<Region, string>();
+const known = new Map<string, string>();
 
 /**
  * Speichert den Snapshot, falls es für diesen TSM-Datenstand noch keinen gibt.
@@ -96,22 +98,24 @@ const known = new Map<Region, string>();
  */
 export async function saveSnapshotIfNew(snapshot: Snapshot): Promise<boolean> {
   const { region, tsmUpdatedAt } = snapshot;
-  if (known.get(region) === tsmUpdatedAt) return false;
+  const scope = snapshot.scope ?? "";
+  const knownKey = `${scope}|${region}`;
+  if (known.get(knownKey) === tsmUpdatedAt) return false;
 
-  const path = snapshotPath(region, tsmUpdatedAt);
+  const path = snapshotPath(region, scope, tsmUpdatedAt);
   if (await exists(path)) {
-    known.set(region, tsmUpdatedAt);
+    known.set(knownKey, tsmUpdatedAt);
     return false;
   }
 
   // Historie vor dem Schreiben laden, damit ein evtl. Rebuild den neuen
   // Snapshot nicht doppelt sieht.
-  const history = await loadHistory(region);
+  const history = await loadHistory(region, scope);
   await writeJson(path, snapshot, false);
   await Promise.all([
-    writeJson(latestPath(region), snapshot, true),
-    writeJson(historyPath(region), prune([...history, toEntry(snapshot)]), true),
+    writeJson(latestPath(region, scope), snapshot, true),
+    writeJson(historyPath(region, scope), prune([...history, toEntry(snapshot)]), true),
   ]);
-  known.set(region, tsmUpdatedAt);
+  known.set(knownKey, tsmUpdatedAt);
   return true;
 }

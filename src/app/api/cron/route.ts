@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { REGIONS } from "@/lib/config";
 import { saveSnapshotIfNew } from "@/lib/store";
-import { getCurrentSnapshot } from "@/lib/tsm";
+import { getCurrentSnapshot } from "@/lib/snapshots";
 
 export const maxDuration = 60;
 

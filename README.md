@@ -19,7 +19,23 @@ Persistenz ausschließlich in Vercel Blob.
 - `robots.txt`, `sitemap.xml` und `llms.txt` (Beschreibung der Seiten und der JSON-API für Agents).
 - Die öffentliche Adresse kommt aus `NEXT_PUBLIC_SITE_URL`, sonst aus Vercels Production-Domain.
 
+## Preisquellen
+
+In der Oberfläche per Dropdown wählbar; die letzte Auswahl bleibt im LocalStorage
+(`wowfd.source`).
+
+- **TSM** (Standard): regionsweite Statistik, etwa täglich aktualisiert.
+- **Blizzard-API**: Angebote eines Auktionshauses (Regelwerk und Fraktion), etwa stündlich.
+  Braucht `BLIZZARD_CLIENT_ID` und `BLIZZARD_CLIENT_SECRET`. Die Zuordnung der Haus-IDs zu
+  den Regelwerken steht in `src/lib/sources.ts`; die API nennt nur die Fraktion, das Regelwerk
+  ist aus dem Abgleich mit TSM abgeleitet.
+
+API: `/api/prices` und `/api/history` nehmen zusätzlich `source=blizzard&house=<id>`.
+
 ## Blob-Layout
+
+TSM-Daten liegen auf den folgenden Pfaden, Blizzard-Daten unter `blizzard/{house}/…` mit
+demselben Aufbau.
 
 - `snapshots/{region}/{tsmUpdatedAt}.json` – ein Snapshot je Datenstand (wird nie überschrieben; `:` im Zeitstempel ist durch `-` ersetzt)
 - `snapshots/{region}/latest.json` – letzter Snapshot

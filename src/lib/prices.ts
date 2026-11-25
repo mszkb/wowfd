@@ -1,4 +1,5 @@
 import { CATEGORIES, itemMeta, type FarmInfo, type Region } from "./config";
+import type { SourceKey } from "./sources";
 import type { PriceItem, Snapshot } from "./tsm";
 
 export interface PriceViewItem extends PriceItem {
@@ -10,6 +11,8 @@ export interface PriceViewItem extends PriceItem {
 /** Snapshot plus Kategorie- und Farm-Angaben – Antwort von /api/prices und Daten der Seite. */
 export interface PricesView {
   region: Region;
+  source?: SourceKey;
+  house?: number;
   tsmUpdatedAt: string;
   fetchedAt: string;
   items: PriceViewItem[];
@@ -18,7 +21,9 @@ export interface PricesView {
 
 export function toPricesView(snapshot: Snapshot): PricesView {
   return {
-    ...snapshot,
+    region: snapshot.region,
+    tsmUpdatedAt: snapshot.tsmUpdatedAt,
+    fetchedAt: snapshot.fetchedAt,
     items: snapshot.items.map((item) => ({ ...item, ...itemMeta(item.itemId) })),
     categories: CATEGORIES.map(({ key, label }) => ({ key, label })),
   };

@@ -14,14 +14,19 @@ dieselben Daten als JSON ohne Anmeldung.
 ## JSON-API
 
 - [/api/prices?region=eu](/api/prices?region=eu): aktuelle Preise. `region` ist `eu` oder `us`.
-  Felder: `tsmUpdatedAt` (Datenstand bei TSM), `fetchedAt` (Abrufzeit), `categories`,
+  Ohne weitere Parameter kommt die TSM-Regionsstatistik. Mit `source=blizzard&house=<id>` kommen
+  die Angebote eines Auktionshauses aus der Blizzard-API (Felder `minBuyout`, `quantity`,
+  `auctions`). Häuser: 111/114/117 Normal (Allianz/Horde/Blackwater), 110/113/116 PvP,
+  119/120/121 Roleplay, 123/124/125 Roleplay PvP.
+  Felder: `tsmUpdatedAt` (Datenstand der Quelle), `fetchedAt` (Abrufzeit), `categories`,
   `items[]` mit `itemId`, `name`, `category`, `values` und bei Kräutern `farm` (Zonen, Route).
 - [/api/history?itemId=13468&region=eu&days=30](/api/history?itemId=13468&region=eu&days=30):
   Preisverlauf eines Items. `days` von 1 bis 365. Antwort: `points[]` mit `t` und `values`.
+  `source` und `house` wie bei `/api/prices`.
 
 ## Einheiten
 
-- Preise (`marketValue`, `historical`, `avgSalePrice`) stehen in Kupfer: 10000 Kupfer = 1 Gold,
+- Preise (`marketValue`, `historical`, `avgSalePrice`, `minBuyout`) stehen in Kupfer: 10000 Kupfer = 1 Gold,
   100 Kupfer = 1 Silber.
 - `soldPerDay` ist die verkaufte Menge pro Tag, `saleRate` der Anteil verkaufter Auktionen (0 bis 1).
-- Die Daten werden von TSM etwa einmal täglich aktualisiert.
+- TSM aktualisiert etwa einmal täglich, die Blizzard-API etwa stündlich.

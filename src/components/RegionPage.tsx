@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import type { Region } from "@/lib/config";
 import { toPricesView, type PricesView } from "@/lib/prices";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
-import { getCurrentSnapshot } from "@/lib/tsm";
+import { getCurrentSnapshot } from "@/lib/snapshots";
 import PriceBoard from "./PriceBoard";
 
 const path = (region: Region) => (region === "eu" ? "/" : "/us");
@@ -74,18 +74,23 @@ export default async function RegionPage({ region }: { region: Region }) {
       <header>
         <h1>WoW-Forever-Preise {region.toUpperCase()}</h1>
         <p className="muted intro">
-          Auktionshauspreise für World of Warcraft: Forever in der Region {region.toUpperCase()},
-          täglich aus den öffentlichen Daten von TradeSkillMaster (TSM). Alle Preise in Gold (g),
-          Silber (s) und Kupfer (c). <strong>marketValue</strong> ist der aktuelle Marktwert,{" "}
-          <strong>historical</strong> der langfristige Durchschnitt, <strong>soldPerDay</strong>{" "}
-          die verkaufte Menge pro Tag. Ein Klick auf eine Zeile zeigt den Preisverlauf, ein Klick
-          auf den Namen kopiert ihn.
+          Auktionshauspreise für World of Warcraft: Forever in der Region {region.toUpperCase()}.
+          Zwei Quellen stehen zur Wahl: die öffentlichen Regionsdaten von TradeSkillMaster (TSM,
+          täglich) und die Blizzard-API mit den Angeboten eines einzelnen Auktionshauses
+          (stündlich). Alle Preise in Gold (g), Silber (s) und Kupfer (c).{" "}
+          <strong>marketValue</strong> ist der aktuelle Marktwert, <strong>historical</strong> der
+          langfristige Durchschnitt, <strong>soldPerDay</strong> die verkaufte Menge pro Tag;
+          bei Blizzard ist <strong>minBuyout</strong> der günstigste Stückpreis,{" "}
+          <strong>quantity</strong> die angebotene Menge und <strong>auctions</strong> die Zahl der
+          Angebote. Ein Klick auf eine Zeile zeigt den Preisverlauf, ein Klick auf den Namen
+          kopiert ihn.
         </p>
       </header>
       {!prices && <noscript>Die Preise konnten nicht geladen werden.</noscript>}
       <PriceBoard region={region} initial={prices} />
       <footer className="muted">
-        Daten: <a href="https://tradeskillmaster.com/public-data">TradeSkillMaster Public Data</a>
+        Daten: <a href="https://tradeskillmaster.com/public-data">TradeSkillMaster Public Data</a>{" "}
+        und Blizzard Game Data API
         {" · "}Maschinenlesbar: <a href={`/api/prices?region=${region}`}>/api/prices?region={region}</a>
         {" · "}<a href="/llms.txt">llms.txt</a>
       </footer>
