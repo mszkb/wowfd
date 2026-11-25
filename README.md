@@ -29,8 +29,6 @@ deshalb den Nachfolger `schedules` mit `path`-Ziel. Der Aufruf ist identisch
 vercel link
 vercel blob create-store wowfd-snapshots --access private --yes   # legt den Store an und verbindet ihn
 vercel env add CRON_SECRET
-vercel env add TSM_CSV_URL_EU
-vercel env add TSM_CSV_URL_US
 vercel env pull .env.local                 # holt BLOB_READ_WRITE_TOKEN
 npm run dev
 ```
@@ -40,9 +38,11 @@ Variablen siehe `.env.example`. `BLOB_ACCESS` muss zum Typ des Stores passen
 
 ## Konfiguration
 
-- Welche Items übernommen werden: `TRACKED_ITEM_IDS` in `src/lib/config.ts`
-  (leer = alle Zeilen der CSV).
-- Die CSV braucht eine Kopfzeile mit einer ID-Spalte (`itemId`, `id` oder `item`).
-  Optional: `name` sowie eine Zeitstempel-Spalte (`updatedAt`, `lastUpdated`, …).
-  Fehlt der Zeitstempel, zählt der `Last-Modified`-Header der CSV, sonst die Abrufzeit.
-  Alle übrigen numerischen Spalten werden als Werte gespeichert.
+- Quelle: `https://public-data.tradeskillmaster.com/retail/{region}/commodities.csv`
+  (öffentlich, ohne Key; Spalten `itemId,name,marketValue,minBuyout,recent,historical,updatedAt`,
+  Preise in Kupfer). Per `TSM_CSV_URL_EU` / `TSM_CSV_URL_US` überschreibbar, z. B. mit
+  `…/retail/{region}/region/items.csv` für die Regionsstatistik.
+- Welche Items übernommen werden: `TSM_ITEM_IDS` (kommagetrennt) oder
+  `DEFAULT_ITEM_IDS` in `src/lib/config.ts`. Leer = alle Zeilen der CSV.
+- Der Datenstand kommt aus der Spalte `updatedAt`; fehlt sie, zählt der
+  `Last-Modified`-Header, sonst die Abrufzeit.

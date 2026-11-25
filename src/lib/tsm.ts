@@ -1,7 +1,7 @@
 import { unstable_cache } from "next/cache";
 import {
   CSV_REVALIDATE_SECONDS,
-  TRACKED_ITEM_IDS,
+  trackedItemIds,
   csvUrl,
   type Region,
 } from "./config";
@@ -57,7 +57,7 @@ export function buildSnapshot(
   }
   const nameCol = findColumn(columns, NAME_COLUMNS);
   const updatedCol = findColumn(columns, UPDATED_COLUMNS);
-  const tracked = new Set(TRACKED_ITEM_IDS);
+  const tracked = new Set(trackedItemIds());
 
   let updated: Date | null = null;
   const items: PriceItem[] = [];
