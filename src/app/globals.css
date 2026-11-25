@@ -50,9 +50,7 @@ a {
 
 main {
   width: 100%;
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 24px 16px;
+  padding: 20px 16px;
   display: grid;
   gap: 16px;
 }
@@ -82,13 +80,13 @@ select {
 table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 14px;
+  font-size: 13px;
   font-variant-numeric: tabular-nums;
 }
 
 th,
 td {
-  padding: 6px 10px;
+  padding: 4px 8px;
   text-align: right;
   border-bottom: 1px solid color-mix(in srgb, var(--foreground) 15%, transparent);
   white-space: nowrap;
@@ -116,7 +114,6 @@ svg.chart {
 
 h2 {
   font-size: 18px;
-  margin-bottom: 8px;
 }
 
 .item {
@@ -133,4 +130,75 @@ h2 {
 .rank {
   color: #b8860b;
   font-size: 12px;
+}
+
+/* Tabellen nebeneinander, sobald der Platz reicht. */
+.categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.category {
+  flex: 1 1 420px;
+  min-width: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.category input {
+  font: inherit;
+  font-size: 14px;
+  padding: 3px 8px;
+  flex: 1 1 140px;
+  min-width: 0;
+  max-width: 260px;
+}
+
+th button.sort {
+  all: unset;
+  cursor: pointer;
+  font-weight: inherit;
+}
+
+th button.sort:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+th.left,
+td.left {
+  text-align: left;
+}
+
+td.farm {
+  white-space: normal;
+  min-width: 150px;
+}
+
+td.farm a {
+  text-decoration: underline;
+}
+
+tr.empty {
+  cursor: default;
+}
+
+tr.empty td {
+  text-align: center;
+  opacity: 0.7;
+}
+
+.category.wide {
+  flex: 1.4 1 600px;
+}
+
+/* Lange Itemnamen dürfen umbrechen, damit drei Tabellen nebeneinander passen. */
+td:first-child {
+  white-space: normal;
+}
+
+.item {
+  display: flex;
 }

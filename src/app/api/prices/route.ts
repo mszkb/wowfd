@@ -29,11 +29,7 @@ export async function GET(request: Request) {
 
   return NextResponse.json({
     ...snapshot,
-    // Reihenfolge wie in der Konfiguration statt wie in der CSV.
-    items: snapshot.items
-      .map((item) => ({ item, meta: itemMeta(item.itemId) }))
-      .sort((a, b) => a.meta.index - b.meta.index)
-      .map(({ item, meta }) => ({ ...item, category: meta.category, rank: meta.rank })),
+    items: snapshot.items.map((item) => ({ ...item, ...itemMeta(item.itemId) })),
     categories: CATEGORIES.map(({ key, label }) => ({ key, label })),
     stored,
   });

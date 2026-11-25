@@ -6,8 +6,21 @@ export function parseRegion(value: string | null): Region | null {
   return (REGIONS as readonly string[]).includes(v) ? (v as Region) : null;
 }
 
+/** Farm-Hinweis für Kräuter. Die Zonen stammen aus Classic. */
+export interface FarmInfo {
+  zones: string;
+  routeUrl?: string;
+}
+
+// Wowhead-Guides mit Routenkarten je Kraut (Classic).
+const ROUTE_EARLY =
+  "https://www.wowhead.com/classic/guide/classic-herbalism-best-farming-basics-early-herbs";
+const ROUTE_HIGH =
+  "https://www.wowhead.com/classic/guide/classic-herbalism-best-farming-high-end-herbs";
+
 export interface TrackedItem {
   id: number;
+  farm?: FarmInfo;
   /** Qualitätsstufe bei Items, die es in mehreren Stufen gibt. */
   rank?: number;
 }
@@ -24,42 +37,42 @@ export const CATEGORIES: Category[] = [
     key: "herbs",
     label: "Kräuter",
     items: [
-      { id: 765 }, // Silverleaf
-      { id: 785 }, // Mageroyal
-      { id: 2447 }, // Peacebloom
-      { id: 2449 }, // Earthroot
-      { id: 2450 }, // Briarthorn
-      { id: 2452 }, // Swiftthistle
-      { id: 2453 }, // Bruiseweed
-      { id: 3355 }, // Wild Steelbloom
-      { id: 3356 }, // Kingsblood
-      { id: 3357 }, // Liferoot
-      { id: 3358 }, // Khadgar's Whisker
-      { id: 3369 }, // Grave Moss
-      { id: 3818 }, // Fadeleaf
-      { id: 3819 }, // Wintersbite
-      { id: 3820 }, // Stranglekelp
-      { id: 3821 }, // Goldthorn
-      { id: 4625 }, // Firebloom
-      { id: 8153 }, // Wildvine
-      { id: 8831 }, // Purple Lotus
-      { id: 8836 }, // Arthas' Tears
-      { id: 8838 }, // Sungrass
-      { id: 8839 }, // Blindweed
-      { id: 8845 }, // Ghost Mushroom
-      { id: 8846 }, // Gromsblood
-      { id: 13463 }, // Dreamfoil
-      { id: 13464 }, // Golden Sansam
-      { id: 13465 }, // Mountain Silversage
-      { id: 13466 }, // Plaguebloom
-      { id: 13467 }, // Icecap
-      { id: 13468 }, // Black Lotus
-      { id: 248821 }, // Demonsage
-      { id: 248822 }, // Death Lotus
-      { id: 248823 }, // Marefoil
-      { id: 249274 }, // Stranglevine
-      { id: 249399 }, // Frilled Lichen
-      { id: 249424 }, // Rosecap
+      { id: 765, farm: { zones: "Elwynn Forest (A), Tirisfal Glades (H)", routeUrl: ROUTE_EARLY } }, // Silverleaf
+      { id: 785, farm: { zones: "The Barrens, Westfall", routeUrl: ROUTE_EARLY } }, // Mageroyal
+      { id: 2447, farm: { zones: "Elwynn Forest (A), Tirisfal Glades (H)", routeUrl: ROUTE_EARLY } }, // Peacebloom
+      { id: 2449, farm: { zones: "Durotar, Loch Modan", routeUrl: ROUTE_EARLY } }, // Earthroot
+      { id: 2450, farm: { zones: "The Barrens, Darkshore", routeUrl: ROUTE_EARLY } }, // Briarthorn
+      { id: 2452, farm: { zones: "Beifang aus Briarthorn und Mageroyal", routeUrl: ROUTE_EARLY } }, // Swiftthistle
+      { id: 2453, farm: { zones: "Hillsbrad Foothills, Ashenvale", routeUrl: ROUTE_EARLY } }, // Bruiseweed
+      { id: 3355, farm: { zones: "Stranglethorn Vale, Arathi Highlands", routeUrl: ROUTE_EARLY } }, // Wild Steelbloom
+      { id: 3356, farm: { zones: "Wetlands, Stranglethorn Vale", routeUrl: ROUTE_EARLY } }, // Kingsblood
+      { id: 3357, farm: { zones: "Flussufer: Wetlands, The Hinterlands", routeUrl: ROUTE_HIGH } }, // Liferoot
+      { id: 3358, farm: { zones: "Stranglethorn Vale, The Hinterlands", routeUrl: ROUTE_HIGH } }, // Khadgar's Whisker
+      { id: 3369, farm: { zones: "Friedhöfe: Raven Hill (Duskwood), Kodo Graveyard (Desolace)", routeUrl: ROUTE_EARLY } }, // Grave Moss
+      { id: 3818, farm: { zones: "Arathi Highlands, Swamp of Sorrows", routeUrl: ROUTE_HIGH } }, // Fadeleaf
+      { id: 3819, farm: { zones: "Alterac Mountains", routeUrl: ROUTE_HIGH } }, // Wintersbite
+      { id: 3820, farm: { zones: "Küsten: Stranglethorn Vale, Wetlands", routeUrl: ROUTE_EARLY } }, // Stranglekelp
+      { id: 3821, farm: { zones: "Arathi Highlands, Stranglethorn Vale", routeUrl: ROUTE_HIGH } }, // Goldthorn
+      { id: 4625, farm: { zones: "Tanaris, Searing Gorge", routeUrl: ROUTE_HIGH } }, // Firebloom
+      { id: 8153, farm: { zones: "Beifang aus Purple Lotus; Trolle in The Hinterlands", routeUrl: ROUTE_HIGH } }, // Wildvine
+      { id: 8831, farm: { zones: "Ruinen in Feralas, Tanaris, Azshara", routeUrl: ROUTE_HIGH } }, // Purple Lotus
+      { id: 8836, farm: { zones: "Western und Eastern Plaguelands, Felwood", routeUrl: ROUTE_HIGH } }, // Arthas' Tears
+      { id: 8838, farm: { zones: "The Hinterlands, Feralas, Azshara", routeUrl: ROUTE_HIGH } }, // Sungrass
+      { id: 8839, farm: { zones: "Swamp of Sorrows, Un'Goro Crater", routeUrl: ROUTE_HIGH } }, // Blindweed
+      { id: 8845, farm: { zones: "Höhlen: Fungal Rock (Un'Goro), The Hinterlands", routeUrl: ROUTE_HIGH } }, // Ghost Mushroom
+      { id: 8846, farm: { zones: "Felwood, Blasted Lands", routeUrl: ROUTE_HIGH } }, // Gromsblood
+      { id: 13463, farm: { zones: "Azshara, Un'Goro Crater, Burning Steppes", routeUrl: ROUTE_HIGH } }, // Dreamfoil
+      { id: 13464, farm: { zones: "Azshara, Felwood", routeUrl: ROUTE_HIGH } }, // Golden Sansam
+      { id: 13465, farm: { zones: "Winterspring, Un'Goro Crater", routeUrl: ROUTE_HIGH } }, // Mountain Silversage
+      { id: 13466, farm: { zones: "Eastern und Western Plaguelands, Felwood", routeUrl: ROUTE_HIGH } }, // Plaguebloom
+      { id: 13467, farm: { zones: "Winterspring", routeUrl: ROUTE_HIGH } }, // Icecap
+      { id: 13468, farm: { zones: "Winterspring, Eastern Plaguelands, Burning Steppes, Silithus", routeUrl: ROUTE_HIGH } }, // Black Lotus
+      { id: 248821, farm: { zones: "Fundorte noch nicht dokumentiert" } }, // Demonsage
+      { id: 248822, farm: { zones: "Fundorte noch nicht dokumentiert" } }, // Death Lotus
+      { id: 248823, farm: { zones: "Fundorte noch nicht dokumentiert" } }, // Marefoil
+      { id: 249274, farm: { zones: "Fundorte noch nicht dokumentiert" } }, // Stranglevine
+      { id: 249399, farm: { zones: "Fundorte noch nicht dokumentiert" } }, // Frilled Lichen
+      { id: 249424, farm: { zones: "Fundorte noch nicht dokumentiert" } }, // Rosecap
       { id: 268415 }, // Commonplace Herb Seeds
       { id: 268416 }, // Uncommon Herb Seeds
       { id: 268417 }, // Unusual Herb Seeds
@@ -144,12 +157,12 @@ const DEFAULT_ITEM_IDS = CATEGORIES.flatMap((c) => c.items.map((i) => i.id));
 
 const ITEM_META = new Map(
   CATEGORIES.flatMap((c) =>
-    c.items.map((i, index) => [i.id, { category: c.key, rank: i.rank, index }] as const),
+    c.items.map((i) => [i.id, { category: c.key, rank: i.rank, farm: i.farm }] as const),
   ),
 );
 
 export function itemMeta(itemId: number) {
-  return ITEM_META.get(itemId) ?? { category: "other", rank: undefined, index: Infinity };
+  return ITEM_META.get(itemId) ?? { category: "other", rank: undefined, farm: undefined };
 }
 
 /**

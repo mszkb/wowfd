@@ -8,6 +8,7 @@ interface PriceItem {
   values: Record<string, number>;
   category: string;
   rank?: number;
+  farm?: { zones: string; routeUrl?: string };
 }
 interface Prices {
   tsmUpdatedAt: string;
@@ -22,11 +23,14 @@ interface Point {
 
 const fmtDate = (iso: string) => new Date(iso).toLocaleString("de-DE");
 /** Preisspalten liefert TSM in Kupfer; angezeigt wird Gold/Silber/Kupfer. */
+const HIDDEN_COLUMNS = new Set(["avgSalePrice", "saleRate"]);
 const PRICE_COLUMNS = new Set(["marketValue", "minBuyout", "recent", "historical", "avgSalePrice"]);
 
 function fmtValue(column: string, n: number | undefined) {
   if (n === undefined) return "–";
-  if (!PRICE_COLUMNS.has(column)) return n.toLocaleString("de-DE");
+  if (!PRICE_COLUMNS.has(column)) {
+    return n.toLocaleString("de-DE", { maximumFractionDigits: n < 10 ? 1 : 0 });
+  }
   const copper = Math.round(n);
   if (copper === 0) return "–";
   const g = Math.floor(copper / 10_000);
@@ -90,6 +94,114 @@ function Chart({ points, column }: { points: Point[]; column: string }) {
   );
 }
 
+type SortKey = "name" | string;
+
+function CategoryTable({
+  label,
+  items,
+  columns,
+  selected,
+  onSelect,
+}: {
+  label: string;
+  items: PriceItem[];
+  columns: string[];
+  selected: number | null;
+  onSelect: (itemId: number) => void;
+}) {
+  const [query, setQuery] = useState("");
+  const [sort, setSort] = useState<{ key: SortKey; desc: boolean }>({
+    key: "marketValue",
+    desc: true,
+  });
+  const showFarm = items.some((i) => i.farm);
+
+  const needle = query.trim().toLowerCase();
+  const rows = items
+    .filter((i) => (i.name ?? String(i.itemId)).toLowerCase().includes(needle))
+    .sort((a, b) => {
+      const cmp =
+        sort.key === "name"
+          ? (a.name ?? "").localeCompare(b.name ?? "")
+          : (a.values[sort.key] ?? -Infinity) - (b.values[sort.key] ?? -Infinity);
+      return sort.desc ? -cmp : cmp;
+    });
+
+  const header = (key: SortKey, text: string) => {
+    const active = sort.key === key;
+    return (
+      <th key={key} aria-sort={active ? (sort.desc ? "descending" : "ascending") : "none"}>
+        <button
+          className="sort"
+          onClick={() =>
+            setSort({ key, desc: active ? !sort.desc : key !== "name" })
+          }>
+          {text}
+          <span aria-hidden="true">{active ? (sort.desc ? " ▼" : " ▲") : ""}</span>
+        </button>
+      </th>
+    );
+  };
+
+  return (
+    <section className={showFarm ? "category wide" : "category"}>
+      <div className="bar">
+        <h2>{label}</h2>
+        <input
+          type="search"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder={`${label} durchsuchen`}
+          aria-label={`${label} durchsuchen`}
+        />
+      </div>
+      <div className="scroll">
+        <table>
+          <thead>
+            <tr>
+              {header("name", "Item")}
+              {columns.map((c) => header(c, c))}
+              {showFarm && <th className="left">Farmen</th>}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((item) => (
+              <tr key={item.itemId} aria-selected={item.itemId === selected}
+                onClick={() => onSelect(item.itemId)}>
+                <td><ItemLabel item={item} /></td>
+                {columns.map((c) => <td key={c}>{fmtValue(c, item.values[c])}</td>)}
+                {showFarm && (
+                  <td className="left farm">
+                    {item.farm ? (
+                      <>
+                        {item.farm.zones}
+                        {item.farm.routeUrl && (
+                          <>
+                            {" · "}
+                            <a href={item.farm.routeUrl} target="_blank" rel="noreferrer"
+                              onClick={(e) => e.stopPropagation()}>
+                              Route
+                            </a>
+                          </>
+                        )}
+                      </>
+                    ) : "–"}
+                  </td>
+                )}
+              </tr>
+            ))}
+            {rows.length === 0 && (
+              <tr className="empty">
+                <td colSpan={columns.length + (showFarm ? 2 : 1)}>Keine Treffer</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
 export default function Home() {
   const [region, setRegion] = useState("eu");
   const [prices, setPrices] = useState<Prices | null>(null);
@@ -127,7 +239,9 @@ export default function Home() {
     };
   }, [selected, region, days]);
 
-  const columns = [...new Set(prices?.items.flatMap((i) => Object.keys(i.values)) ?? [])];
+  const columns = [
+    ...new Set(prices?.items.flatMap((i) => Object.keys(i.values)) ?? []),
+  ].filter((c) => !HIDDEN_COLUMNS.has(c));
   const chartColumn = column && columns.includes(column) ? column : columns[0];
   const selectedItem = prices?.items.find((i) => i.itemId === selected);
 
@@ -189,37 +303,22 @@ export default function Home() {
         </section>
       )}
 
-      {prices?.categories.map((cat) => {
-        const items = prices.items.filter((i) => i.category === cat.key);
-        if (items.length === 0) return null;
-        return (
-          <section key={cat.key}>
-            <h2>{cat.label}</h2>
-            <div className="scroll">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Item</th>
-                    {columns.map((c) => <th key={c}>{c}</th>)}
-                  </tr>
-                </thead>
-                <tbody>
-                  {items.map((item) => (
-                    <tr key={item.itemId} aria-selected={item.itemId === selected}
-                      onClick={() => {
-                        setPoints(null);
-                        setSelected(item.itemId);
-                      }}>
-                      <td><ItemLabel item={item} /></td>
-                      {columns.map((c) => <td key={c}>{fmtValue(c, item.values[c])}</td>)}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </section>
-        );
-      })}
+      {prices && (
+        <div className="categories">
+          {prices.categories.map((cat) => {
+            const items = prices.items.filter((i) => i.category === cat.key);
+            if (items.length === 0) return null;
+            return (
+              <CategoryTable key={cat.key} label={cat.label} items={items} columns={columns}
+                selected={selected}
+                onSelect={(itemId) => {
+                  setPoints(null);
+                  setSelected(itemId);
+                }} />
+            );
+          })}
+        </div>
+      )}
     </main>
   );
 }
