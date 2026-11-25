@@ -36,6 +36,13 @@ npm run dev
 Variablen siehe `.env.example`. `BLOB_ACCESS` muss zum Typ des Stores passen
 (`private` ist Standard).
 
+## Deployment
+
+Jeder Push auf `main` deployt per GitHub Action (`.github/workflows/deploy.yml`)
+nach Production. Dafür braucht das Repository drei Secrets: `VERCEL_TOKEN`,
+`VERCEL_ORG_ID` und `VERCEL_PROJECT_ID` (die beiden IDs stehen nach `vercel link`
+in `.vercel/project.json`).
+
 ## Konfiguration
 
 - Quelle: `https://public-data.tradeskillmaster.com/forever/{region}/region/items.csv`
